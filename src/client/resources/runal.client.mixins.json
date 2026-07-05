@@ -1,0 +1,20 @@
+{
+	"required": true,
+	"package": "com.runal.client.mixin",
+	"compatibilityLevel": "${java}",
+	"client": [
+		"LocalPlayerMixin",
+		"LightmapRenderStateExtractorMixin",
+		"HumanoidArmorLayerMixin",
+		"AvatarRendererMixin",
+		"EntityGlowMixin",
+		"HidePlayersMixin"
+
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

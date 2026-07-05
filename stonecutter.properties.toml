@@ -1,0 +1,35 @@
+# See https://stonecutter.kikugie.dev/wiki/config/properties#centralized-properties
+mod.id = "runal"
+mod.name = "Runal"
+mod.group = "com.example"
+mod.version = "1.0.5"
+
+deps.fabric_loader = "0.19.3"
+loomx.loom_version = "1.17-SNAPSHOT"
+
+["1.21.4"]
+mod.mc_compat = "~1.21.4"
+mod.mc_releases = ["1.21.4"]
+mod.java_depends = ">=21"
+mod.java_level = "JAVA_21"
+mod.java_major = "21"
+
+deps.fabric_api = "0.119.4+1.21.4"
+
+["1.21.11"]
+mod.mc_compat = "~1.21.11"
+mod.mc_releases = ["1.21.11"]
+mod.java_depends = ">=21"
+mod.java_level = "JAVA_21"
+mod.java_major = "21"
+
+deps.fabric_api = "0.141.4+1.21.11"
+
+["26.1.2"]
+mod.mc_compat = "~26.1.2"
+mod.mc_releases = ["26.1.2"]
+mod.java_depends = ">=25"
+mod.java_level = "JAVA_25"
+mod.java_major = "25"
+
+deps.fabric_api = "0.153.0+26.1.2"

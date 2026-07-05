@@ -1,0 +1,346 @@
+package com.runal.client;
+
+import com.runal.AutoSprintState;
+import net.minecraft.client.Minecraft;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class BuiltinModules {
+
+    public static void registerAll() {
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(new KeybindModuleSetting(RunalClient.getAutoSprintKey()));
+            public String getName() { return "Auto Sprint"; }
+            public String getCategory() { return "Combat"; }
+            public boolean isEnabled() { return AutoSprintState.INSTANCE.isEnabled(); }
+            public void toggle() { AutoSprintState.INSTANCE.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new SettingGroup("Display", List.of(
+                            new EnumModuleSetting("Warning Mode", List.of("Sound", "Title", "Both"), () -> LowHealthWarning.warningMode, v -> LowHealthWarning.warningMode = v),
+                            new ToggleModuleSetting("Low HP", () -> LowHealthWarning.lowHpEnabled, v -> LowHealthWarning.lowHpEnabled = v),
+                            new SliderModuleSetting("Low HP Threshold", 0.05f, 1.0f, 0.05f, () -> LowHealthWarning.lowHpThreshold, v -> LowHealthWarning.lowHpThreshold = v),
+                            new ToggleModuleSetting("Mid HP", () -> LowHealthWarning.midHpEnabled, v -> LowHealthWarning.midHpEnabled = v),
+                            new SliderModuleSetting("Mid HP Threshold", 0.05f, 1.0f, 0.05f, () -> LowHealthWarning.midHpThreshold, v -> LowHealthWarning.midHpThreshold = v)
+                    )),
+                    new SettingGroup("Title Settings", List.of(
+                            new TextModuleSetting("Low HP Title", () -> LowHealthWarning.lowHpTitle, v -> LowHealthWarning.lowHpTitle = v),
+                            new TextModuleSetting("Mid HP Title", () -> LowHealthWarning.midHpTitle, v -> LowHealthWarning.midHpTitle = v)
+                    )),
+                    new SettingGroup("Sound Settings", List.of(
+                            new ToggleModuleSetting("Sound", () -> LowHealthWarning.soundEnabled, v -> LowHealthWarning.soundEnabled = v),
+                            new SliderModuleSetting("Volume", 0.1f, 2.0f, 0.1f, () -> LowHealthWarning.soundVolume, v -> LowHealthWarning.soundVolume = v)
+                    )),
+                    new KeybindModuleSetting(RunalClient.getLowHealthToggleKey())
+            );
+            public String getName() { return "Health Indicator"; }
+            public String getCategory() { return "Combat"; }
+            public boolean isEnabled() { return LowHealthWarning.isEnabled(); }
+            public void toggle() { LowHealthWarning.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ColorModuleSetting("Player Color", () -> HitboxesState.INSTANCE.playerColor, v -> HitboxesState.INSTANCE.playerColor = v),
+                    new ColorModuleSetting("Entity Color", () -> HitboxesState.INSTANCE.entityColor, v -> HitboxesState.INSTANCE.entityColor = v),
+                    new SliderModuleSetting("Line Width", 1.0f, 5.0f, 0.5f, () -> HitboxesState.INSTANCE.lineWidth, v -> HitboxesState.INSTANCE.lineWidth = v),
+                    new KeybindModuleSetting(RunalClient.getHitboxesKey())
+            );
+            public String getName() { return "Hitboxes"; }
+            public String getCategory() { return "Combat"; }
+            public boolean isEnabled() { return HitboxesState.INSTANCE.isEnabled(); }
+            public void toggle() { HitboxesState.INSTANCE.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(new KeybindModuleSetting(RunalClient.getFullbrightKey()));
+            public String getName() { return "Fullbright"; }
+            public String getCategory() { return "Visual"; }
+            public boolean isEnabled() { return FullbrightState.INSTANCE.isEnabled(); }
+            public void toggle() { FullbrightState.INSTANCE.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(new KeybindModuleSetting(RunalClient.getHidePlayersKey()));
+            public String getName() { return "Hide Players"; }
+            public String getCategory() { return "Visual"; }
+            public boolean isEnabled() { return HidePlayersState.INSTANCE.isEnabled(); }
+            public void toggle() { HidePlayersState.INSTANCE.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = buildHotbarSwapSettings();
+            public String getName() { return "Hotbar Swap"; }
+            public String getCategory() { return "Misc"; }
+            public boolean isEnabled() { return true; }
+            public void toggle() { }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = buildCommandBindSettings();
+            public String getName() { return "Command Binds"; }
+            public String getCategory() { return "Misc"; }
+            public boolean isEnabled() { return true; }
+            public void toggle() { }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new TextModuleSetting("Response", () -> AutoGGState.INSTANCE.response, v -> AutoGGState.INSTANCE.response = v),
+                    new KeybindModuleSetting(RunalClient.getAutoGGKey())
+            );
+            public String getName() { return "Auto GG"; }
+            public String getCategory() { return "Misc"; }
+            public boolean isEnabled() { return AutoGGState.INSTANCE.isEnabled(); }
+            public void toggle() { AutoGGState.INSTANCE.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ToggleModuleSetting("Trash Common", () -> AutoTrashState.INSTANCE.trashCommon, v -> AutoTrashState.INSTANCE.trashCommon = v),
+                    new ToggleModuleSetting("Trash Uncommon", () -> AutoTrashState.INSTANCE.trashUncommon, v -> AutoTrashState.INSTANCE.trashUncommon = v),
+                    new ToggleModuleSetting("Trash Rare", () -> AutoTrashState.INSTANCE.trashRare, v -> AutoTrashState.INSTANCE.trashRare = v),
+                    new ToggleModuleSetting("Trash Epic", () -> AutoTrashState.INSTANCE.trashEpic, v -> AutoTrashState.INSTANCE.trashEpic = v),
+                    new ToggleModuleSetting("Trash Legendary", () -> AutoTrashState.INSTANCE.trashLegendary, v -> AutoTrashState.INSTANCE.trashLegendary = v),
+                    new ToggleModuleSetting("Trash Mythical", () -> AutoTrashState.INSTANCE.trashMythical, v -> AutoTrashState.INSTANCE.trashMythical = v),
+                    new KeybindModuleSetting(RunalClient.getAutoTrashKey())
+            );
+            public String getName() { return "Auto Trash"; }
+            public String getCategory() { return "Misc"; }
+            public boolean isEnabled() { return AutoTrashState.INSTANCE.isEnabled(); }
+            public void toggle() { AutoTrashState.INSTANCE.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ToggleModuleSetting("Hide for Others", () -> HideArmorState.INSTANCE.hideForOthers, v -> HideArmorState.INSTANCE.hideForOthers = v),
+                    new ToggleModuleSetting("Hide Helmet", () -> HideArmorState.INSTANCE.hideHelmet, v -> HideArmorState.INSTANCE.hideHelmet = v),
+                    new ToggleModuleSetting("Hide Chestplate", () -> HideArmorState.INSTANCE.hideChestplate, v -> HideArmorState.INSTANCE.hideChestplate = v),
+                    new ToggleModuleSetting("Hide Leggings", () -> HideArmorState.INSTANCE.hideLeggings, v -> HideArmorState.INSTANCE.hideLeggings = v),
+                    new ToggleModuleSetting("Hide Boots", () -> HideArmorState.INSTANCE.hideBoots, v -> HideArmorState.INSTANCE.hideBoots = v),
+                    new KeybindModuleSetting(RunalClient.getHideArmorKey())
+            );
+            public String getName() { return "Hide Armor"; }
+            public String getCategory() { return "Visual"; }
+            public boolean isEnabled() { return HideArmorState.INSTANCE.isEnabled(); }
+            public void toggle() { HideArmorState.INSTANCE.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final HealthBarState state = HealthBarState.INSTANCE;
+            private final List<ModuleSetting> settings = List.of(
+                    new EnumModuleSetting("Render Mode", List.of("Third Person", "Always"), () -> state.renderMode, v -> state.renderMode = v),
+                    new EnumModuleSetting("Render Style", List.of("Bar", "Compact", "Text"), () -> state.renderStyle, v -> state.renderStyle = v),
+                    new SettingGroup("Display & Positioning", List.of(
+                            new EnumModuleSetting("Health Format", List.of("Current", "Percent"), () -> state.healthFormat, v -> state.healthFormat = v),
+                            new ToggleModuleSetting("Show Max Health", () -> state.showMaxHealth, v -> state.showMaxHealth = v),
+                            new EnumModuleSetting("Text Position", List.of("Center", "Left", "Right", "Above", "Below"), () -> state.textPosition, v -> state.textPosition = v),
+                            new SliderModuleSetting("Y Offset", -40f, 40f, 1f, () -> (float) state.yOffset, v -> state.yOffset = Math.round(v))
+                    )),
+                    new SettingGroup("Text Customization", List.of(
+                            new ColorModuleSetting("Text Color", () -> state.textColor, v -> state.textColor = v),
+                            new EnumModuleSetting("Text Style", List.of("Shadow", "Flat"), () -> state.textStyle, v -> state.textStyle = v),
+                            new SliderModuleSetting("Text Scale", 0.5f, 2.0f, 0.1f, () -> state.textScale, v -> state.textScale = v)
+                    )),
+                    new SettingGroup("Colors & Animations", List.of(
+                            new ToggleModuleSetting("Smooth Interpolation", () -> state.smoothInterpolation, v -> state.smoothInterpolation = v),
+                            new ToggleModuleSetting("Damage Flash", () -> state.damageFlash, v -> state.damageFlash = v),
+                            new ColorModuleSetting("Damage Flash Color", () -> state.damageFlashColor, v -> state.damageFlashColor = v),
+                            new ColorModuleSetting("High HP Color", () -> state.highHpColor, v -> state.highHpColor = v),
+                            new ColorModuleSetting("Mid HP Color", () -> state.midHpColor, v -> state.midHpColor = v),
+                            new ColorModuleSetting("Low HP Color", () -> state.lowHpColor, v -> state.lowHpColor = v),
+                            new ColorModuleSetting("Background Color", () -> state.backgroundColor, v -> state.backgroundColor = v),
+                            new ColorModuleSetting("Border Color", () -> state.borderColor, v -> state.borderColor = v),
+                            new SliderModuleSetting("Mid HP Threshold", 0.05f, 1.0f, 0.05f, () -> state.midHpThreshold, v -> state.midHpThreshold = v),
+                            new SliderModuleSetting("Low HP Threshold", 0.05f, 1.0f, 0.05f, () -> state.lowHpThreshold, v -> state.lowHpThreshold = v)
+                    )),
+                    new SettingGroup("Bar Dimensions", List.of(
+                            new SliderModuleSetting("Width", 20f, 160f, 1f, () -> (float) state.width, v -> state.width = Math.round(v)),
+                            new SliderModuleSetting("Height", 3f, 24f, 1f, () -> (float) state.height, v -> state.height = Math.round(v))
+                    )),
+                    new KeybindModuleSetting(RunalClient.getHealthBarKey())
+            );
+            public String getName() { return "Health Bar"; }
+            public String getCategory() { return "Visual"; }
+            public boolean isEnabled() { return state.isEnabled(); }
+            public void toggle() { state.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new EnumModuleSetting("Target", List.of("Self", "Everyone"), () -> PlayerScaleState.INSTANCE.target, v -> PlayerScaleState.INSTANCE.target = v),
+                    new SliderModuleSetting("X Scale", 0.1f, 3.0f, 0.1f, () -> PlayerScaleState.INSTANCE.getXScale(), v -> PlayerScaleState.INSTANCE.setXScale(v)),
+                    new SliderModuleSetting("Y Scale", 0.1f, 3.0f, 0.1f, () -> PlayerScaleState.INSTANCE.getYScale(), v -> PlayerScaleState.INSTANCE.setYScale(v)),
+                    new SliderModuleSetting("Z Scale", 0.1f, 3.0f, 0.1f, () -> PlayerScaleState.INSTANCE.getZScale(), v -> PlayerScaleState.INSTANCE.setZScale(v)),
+                    new KeybindModuleSetting(RunalClient.getPlayerScaleKey())
+            );
+            public String getName() { return "Player Size"; }
+            public String getCategory() { return "Visual"; }
+            public boolean isEnabled() { return PlayerScaleState.INSTANCE.isScaled(); }
+            public void toggle() { if (isEnabled()) PlayerScaleState.INSTANCE.setScale(1.0f); else PlayerScaleState.INSTANCE.setScale(1.2f); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ToggleModuleSetting("Show HUD", () -> SessionManagerState.showHud, v -> SessionManagerState.showHud = v),
+                    new ColorModuleSetting("Widget Color", () -> SessionManagerState.widgetColor, v -> SessionManagerState.widgetColor = v),
+                    new ColorModuleSetting("Label Color", () -> SessionManagerState.labelColor, v -> SessionManagerState.labelColor = v),
+                    new ColorModuleSetting("Value Color", () -> SessionManagerState.valueColor, v -> SessionManagerState.valueColor = v),
+                    new EnumModuleSetting("Time Format", List.of("Short", "Long"), () -> SessionManagerState.timeFormat, v -> SessionManagerState.timeFormat = v)
+            );
+            public String getName() { return "Session Manager"; }
+            public String getCategory() { return "Tracking"; }
+            public boolean isEnabled() { return SessionManagerState.enabled; }
+            public void toggle() { SessionManagerState.enabled = !SessionManagerState.enabled; }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ToggleModuleSetting("FPS", () -> PerformanceHudState.fps, v -> PerformanceHudState.fps = v),
+                    new ToggleModuleSetting("TPS", () -> PerformanceHudState.tps, v -> PerformanceHudState.tps = v),
+                    new ToggleModuleSetting("Ping", () -> PerformanceHudState.ping, v -> PerformanceHudState.ping = v),
+                    new ToggleModuleSetting("Direction", () -> PerformanceHudState.direction, v -> PerformanceHudState.direction = v),
+                    new ColorModuleSetting("Name Color", () -> PerformanceHudState.nameColor, v -> PerformanceHudState.nameColor = v),
+                    new ColorModuleSetting("Value Color", () -> PerformanceHudState.valueColor, v -> PerformanceHudState.valueColor = v)
+            );
+            public String getName() { return "Performance HUD"; }
+            public String getCategory() { return "Tracking"; }
+            public boolean isEnabled() { return PerformanceHudState.enabled; }
+            public void toggle() { PerformanceHudState.enabled = !PerformanceHudState.enabled; }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ColorModuleSetting("Name Color", () -> EventTrackerState.nameColor, v -> EventTrackerState.nameColor = v),
+                    new ColorModuleSetting("Value Color", () -> EventTrackerState.valueColor, v -> EventTrackerState.valueColor = v)
+            );
+            public String getName() { return "Event Tracker"; }
+            public String getCategory() { return "Tracking"; }
+            public boolean isEnabled() { return EventTrackerState.enabled; }
+            public void toggle() { EventTrackerState.enabled = !EventTrackerState.enabled; }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ColorModuleSetting("Name Color", () -> ItemCooldownHudState.nameColor, v -> ItemCooldownHudState.nameColor = v),
+                    new ColorModuleSetting("Value Color", () -> ItemCooldownHudState.valueColor, v -> ItemCooldownHudState.valueColor = v)
+            );
+            public String getName() { return "Item Cooldowns"; }
+            public String getCategory() { return "Tracking"; }
+            public boolean isEnabled() { return ItemCooldownHudState.enabled; }
+            public void toggle() { ItemCooldownHudState.enabled = !ItemCooldownHudState.enabled; }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ToggleModuleSetting("Show HUD", () -> ArmorHudState.showHud, v -> ArmorHudState.showHud = v),
+                    new EnumModuleSetting("Orientation", List.of("Horizontal", "Vertical"), () -> ArmorHudState.orientation, v -> ArmorHudState.orientation = v)
+            );
+            public String getName() { return "Armor HUD"; }
+            public String getCategory() { return "Visual"; }
+            public boolean isEnabled() { return ArmorHudState.enabled; }
+            public void toggle() { ArmorHudState.enabled = !ArmorHudState.enabled; }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ToggleModuleSetting("Chat Notifications", () -> RunalSettings.chatNotifications, v -> RunalSettings.chatNotifications = v),
+                    new ColorModuleSetting("Accent Color", () -> RunalSettings.accentColor, v -> RunalSettings.accentColor = v),
+                    new ToggleModuleSetting("Rounded Panel Bottoms", () -> RunalSettings.roundedPanelBottoms, v -> RunalSettings.roundedPanelBottoms = v),
+                    new ButtonModuleSetting("HUD Editor", "Open", () -> Minecraft.getInstance().setScreen(new HudEditorScreen())),
+                    new KeybindModuleSetting(RunalClient.getOpenMenuKey())
+            );
+            public String getName() { return "Click GUI"; }
+            public String getCategory() { return "Misc"; }
+            public boolean isEnabled() { return true; }
+            public void toggle() { Minecraft.getInstance().setScreen(new RunalScreen()); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ToggleModuleSetting("Glow", () -> TeamTrackerState.INSTANCE.glowEnabled, v -> TeamTrackerState.INSTANCE.glowEnabled = v),
+                    new ColorModuleSetting("Marker Color", () -> TeamTrackerState.INSTANCE.markerColor, v -> TeamTrackerState.INSTANCE.markerColor = v),
+                    new ButtonModuleSetting("Team Selector", "Open", () -> Minecraft.getInstance().setScreen(new TeamTrackerScreen())),
+                    new KeybindModuleSetting(RunalClient.getTeamTrackerKey())
+            );
+            public String getName() { return "Team Tracker"; }
+            public String getCategory() { return "Tracking"; }
+            public boolean isEnabled() { return TeamTrackerState.INSTANCE.isEnabled(); }
+            public void toggle() { TeamTrackerState.INSTANCE.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ToggleModuleSetting("Show Beams", () -> WaypointManagerState.INSTANCE.showBeams, v -> WaypointManagerState.INSTANCE.showBeams = v),
+                    new ButtonModuleSetting("Waypoint Manager", "Open", () -> Minecraft.getInstance().setScreen(new WaypointManagerScreen())),
+                    new KeybindModuleSetting(RunalClient.getWaypointManagerKey()),
+                    new KeybindModuleSetting(RunalClient.getNewWaypointKey())
+            );
+            public String getName() { return "Waypoints"; }
+            public String getCategory() { return "Tracking"; }
+            public boolean isEnabled() { return WaypointManagerState.INSTANCE.isEnabled(); }
+            public void toggle() { WaypointManagerState.INSTANCE.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ColorModuleSetting("Text Color", () -> BossTitleState.textColor, v -> BossTitleState.textColor = v),
+                    new SliderModuleSetting("Scale", 1.0f, 5.0f, 0.25f, () -> BossTitleState.scale, v -> BossTitleState.scale = v)
+            );
+            public String getName() { return "Boss Callout"; }
+            public String getCategory() { return "Tracking"; }
+            public boolean isEnabled() { return BossTitleState.enabled; }
+            public void toggle() { BossTitleState.enabled = !BossTitleState.enabled; }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+    }
+
+    private static List<ModuleSetting> buildHotbarSwapSettings() {
+        List<String> rowOptions = List.of(HotbarSwapState.ROW_TOP, HotbarSwapState.ROW_MIDDLE, HotbarSwapState.ROW_BOTTOM);
+        List<ModuleSetting> settings = new ArrayList<>();
+        for (int i = 0; i < HotbarSwapState.SLOT_COUNT; i++) {
+            int idx = i;
+            settings.add(new SettingGroup("Slot " + (i + 1), List.of(
+                    new EnumModuleSetting("Row", rowOptions, () -> HotbarSwapState.INSTANCE.rows[idx], v -> HotbarSwapState.INSTANCE.rows[idx] = v),
+                    new KeybindModuleSetting(RunalClient.getHotbarSwapKey(idx))
+            )));
+        }
+        return settings;
+    }
+
+    private static List<ModuleSetting> buildCommandBindSettings() {
+        List<ModuleSetting> settings = new ArrayList<>();
+        for (int i = 0; i < CommandBindState.SLOT_COUNT; i++) {
+            int idx = i;
+            settings.add(new SettingGroup("Slot " + (i + 1), List.of(
+                    new TextModuleSetting("Command", () -> CommandBindState.INSTANCE.commands[idx], v -> CommandBindState.INSTANCE.commands[idx] = v),
+                    new KeybindModuleSetting(RunalClient.getCommandBindKey(idx))
+            )));
+        }
+        return settings;
+    }
+}
+

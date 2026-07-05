@@ -1,0 +1,223 @@
+package com.runal.client;
+
+//? if 1.21.4 || 1.21.11 {
+/*import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+*///?} else {
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+//?}
+import net.minecraft.client.Minecraft;
+//? if 1.21.4 || 1.21.11 {
+//?} else {
+import net.minecraft.resources.Identifier;
+//?}
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class UtilityHudRenderer {
+
+    public static void register() {
+        //? if 1.21.4 || 1.21.11 {
+        /*HudRenderCallback.EVENT.register(UtilityHudRenderer::render);
+        *///?} else {
+        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("runal", "utility_huds"), UtilityHudRenderer::render);
+        //?}
+    }
+
+    private static void render(net.minecraft.client.gui.GuiGraphicsExtractor graphics, net.minecraft.client.DeltaTracker deltaTracker) {
+        renderPreview(graphics);
+    }
+
+    public static void renderPreview(net.minecraft.client.gui.GuiGraphicsExtractor graphics) {
+        Minecraft mc = Minecraft.getInstance();
+
+        if (SessionManagerState.enabled && SessionManagerState.showHud) {
+            long seconds = (System.currentTimeMillis() - SessionManagerState.startTimeMs) / 1000L;
+            drawPanel(graphics, SessionManagerState.x, SessionManagerState.y, 112, 24, SessionManagerState.widgetColor);
+            drawLine(graphics, mc, SessionManagerState.x + 6, SessionManagerState.y + 8, "Playtime", formatTime(seconds), SessionManagerState.labelColor, SessionManagerState.valueColor);
+        }
+
+        if (PerformanceHudState.enabled) {
+            int lines = countPerformanceLines();
+            int h = Math.max(16, lines * 11 + 8);
+            int y = PerformanceHudState.y + 5;
+            drawPanel(graphics, PerformanceHudState.x, PerformanceHudState.y, 112, h, 0xAA101216);
+            if (PerformanceHudState.fps) { drawLine(graphics, mc, PerformanceHudState.x + 6, y, "FPS", String.valueOf(mc.getFps()), PerformanceHudState.nameColor, PerformanceHudState.valueColor); y += 11; }
+            if (PerformanceHudState.tps) { drawLine(graphics, mc, PerformanceHudState.x + 6, y, "TPS", "20.0", PerformanceHudState.nameColor, PerformanceHudState.valueColor); y += 11; }
+            if (PerformanceHudState.ping && mc.player != null && mc.getConnection() != null && mc.getConnection().getPlayerInfo(mc.player.getUUID()) != null) {
+                drawLine(graphics, mc, PerformanceHudState.x + 6, y, "Ping", mc.getConnection().getPlayerInfo(mc.player.getUUID()).getLatency() + "ms", PerformanceHudState.nameColor, PerformanceHudState.valueColor); y += 11;
+            }
+            if (PerformanceHudState.direction && mc.player != null) drawLine(graphics, mc, PerformanceHudState.x + 6, y, "Dir", mc.player.getDirection().getName(), PerformanceHudState.nameColor, PerformanceHudState.valueColor);
+        }
+
+        if (ArmorHudState.enabled && ArmorHudState.showHud && mc.player != null) {
+            drawArmor(graphics, mc);
+        }
+
+        if (ItemCooldownHudState.enabled && mc.player != null) {
+            drawItemCooldowns(graphics, mc);
+        }
+
+        if (EventTrackerState.enabled && !EventTrackerState.events.isEmpty()) {
+            int lines = EventTrackerState.events.size();
+            int h = Math.max(16, lines * 11 + 8);
+            int w = 60;
+            for (EventTrackerState.TrackedEvent event : EventTrackerState.events.values()) {
+                String value = event.remainingSeconds > 0 ? EventTrackerState.formatTime(event.remainingSeconds) : "Active";
+                w = Math.max(w, mc.font.width(event.name + ": " + value) + 12);
+            }
+            drawPanel(graphics, EventTrackerState.x, EventTrackerState.y, w, h, 0xAA101216);
+            int y = EventTrackerState.y + 5;
+            for (EventTrackerState.TrackedEvent event : EventTrackerState.events.values()) {
+                String value = event.remainingSeconds > 0 ? EventTrackerState.formatTime(event.remainingSeconds) : "Active";
+                drawLine(graphics, mc, EventTrackerState.x + 6, y, event.name, value, EventTrackerState.nameColor, EventTrackerState.valueColor);
+                y += 11;
+            }
+        }
+
+        String activeTitleKind = LowHealthWarning.getActiveTitleKind();
+        if ("low".equals(activeTitleKind) && !LowHealthWarning.lowHpTitle.isEmpty()) {
+            drawWarningTitle(graphics, mc, LowHealthWarning.lowHpTitle, LowHealthWarning.lowTitleX, LowHealthWarning.lowTitleY);
+        } else if ("mid".equals(activeTitleKind) && !LowHealthWarning.midHpTitle.isEmpty()) {
+            drawWarningTitle(graphics, mc, LowHealthWarning.midHpTitle, LowHealthWarning.midTitleX, LowHealthWarning.midTitleY);
+        }
+
+        if (BossTitleState.enabled && BossTitleState.currentText != null) {
+            BossTitleState.ensureDefaultPosition(mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
+            drawBossTitle(graphics, mc);
+        }
+    }
+
+    public static final float WARNING_TITLE_SCALE = 2.5f;
+
+    private static void drawWarningTitle(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc, String title, int x, int y) {
+        //? if 1.21.4 {
+        /*graphics.pose().pushPose();
+        graphics.pose().translate(x, y, 0f);
+        graphics.pose().scale(WARNING_TITLE_SCALE, WARNING_TITLE_SCALE, 1f);
+        *///?} else {
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(x, y);
+        graphics.pose().scale(WARNING_TITLE_SCALE, WARNING_TITLE_SCALE);
+        //?}
+        graphics.text(mc.font, title, 0, 0, 0xFFFF3B3B, true);
+        //? if 1.21.4 {
+        /*graphics.pose().popPose();
+        *///?} else {
+        graphics.pose().popMatrix();
+        //?}
+    }
+
+    private static void drawBossTitle(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
+        //? if 1.21.4 {
+        /*graphics.pose().pushPose();
+        graphics.pose().translate(BossTitleState.x, BossTitleState.y, 0f);
+        graphics.pose().scale(BossTitleState.scale, BossTitleState.scale, 1f);
+        *///?} else {
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(BossTitleState.x, BossTitleState.y);
+        graphics.pose().scale(BossTitleState.scale, BossTitleState.scale);
+        //?}
+        graphics.centeredText(mc.font, BossTitleState.currentText, 0, 0, BossTitleState.textColor);
+        //? if 1.21.4 {
+        /*graphics.pose().popPose();
+        *///?} else {
+        graphics.pose().popMatrix();
+        //?}
+    }
+
+    private static int countPerformanceLines() {
+        int lines = 0;
+        if (PerformanceHudState.fps) lines++;
+        if (PerformanceHudState.tps) lines++;
+        if (PerformanceHudState.ping) lines++;
+        if (PerformanceHudState.direction) lines++;
+        return lines;
+    }
+
+    private static void drawPanel(net.minecraft.client.gui.GuiGraphicsExtractor graphics, int x, int y, int w, int h, int color) {
+        graphics.fill(x + 2, y + 3, x + w + 2, y + h + 3, 0x33000000);
+        graphics.fill(x, y, x + w, y + h, color);
+        graphics.outline(x, y, w, h, 0x5535D77A);
+    }
+
+    private static void drawItemCooldowns(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
+        List<String> names = new ArrayList<>();
+        List<Integer> percents = new ArrayList<>();
+        Set<String> seenNames = new HashSet<>();
+
+        for (int slotId = InventoryMenu.INV_SLOT_START; slotId < InventoryMenu.USE_ROW_SLOT_END; slotId++) {
+            Slot slot = mc.player.containerMenu.getSlot(slotId);
+            if (!slot.hasItem()) continue;
+
+            ItemStack stack = slot.getItem();
+            if (!mc.player.getCooldowns().isOnCooldown(stack)) continue;
+
+            // Dedupe by the item's exact display name rather than its cooldown group: this
+            // server reuses the same underlying item/block for multiple custom items that only
+            // differ by resource-pack texture and name, so they share a cooldown group but are
+            // meant to be tracked as distinct items.
+            String name = stack.getHoverName().getString();
+            if (!seenNames.add(name)) continue;
+
+            float percent = mc.player.getCooldowns().getCooldownPercent(stack, 1.0f);
+            names.add(name);
+            percents.add(Math.round(percent * 100f));
+        }
+
+        if (names.isEmpty()) return;
+
+        int h = Math.max(16, names.size() * 11 + 8);
+        int w = 60;
+        for (int i = 0; i < names.size(); i++) {
+            w = Math.max(w, mc.font.width(names.get(i) + ": " + percents.get(i) + "%") + 12);
+        }
+
+        drawPanel(graphics, ItemCooldownHudState.x, ItemCooldownHudState.y, w, h, 0xAA101216);
+        int y = ItemCooldownHudState.y + 5;
+        for (int i = 0; i < names.size(); i++) {
+            drawLine(graphics, mc, ItemCooldownHudState.x + 6, y, names.get(i), percents.get(i) + "%", ItemCooldownHudState.nameColor, ItemCooldownHudState.valueColor);
+            y += 11;
+        }
+    }
+
+    private static void drawArmor(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
+        EquipmentSlot[] slots = { EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET };
+        int x = ArmorHudState.x;
+        int y = ArmorHudState.y;
+        int w = "Vertical".equals(ArmorHudState.orientation) ? 24 : 84;
+        int h = "Vertical".equals(ArmorHudState.orientation) ? 84 : 24;
+        drawPanel(graphics, x, y, w, h, 0xAA101216);
+
+        for (int i = 0; i < slots.length; i++) {
+            ItemStack stack = mc.player.getItemBySlot(slots[i]);
+            int ix = "Vertical".equals(ArmorHudState.orientation) ? x + 4 : x + 4 + i * 20;
+            int iy = "Vertical".equals(ArmorHudState.orientation) ? y + 4 + i * 20 : y + 4;
+            if (!stack.isEmpty()) {
+                graphics.item(stack, ix, iy);
+                graphics.itemDecorations(mc.font, stack, ix, iy);
+            } else {
+                graphics.outline(ix, iy, 16, 16, 0x559D9DA8);
+            }
+        }
+    }
+
+    private static void drawLine(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc, int x, int y, String label, String value, int labelColor, int valueColor) {
+        graphics.text(mc.font, label + ":", x, y, labelColor, true);
+        graphics.text(mc.font, value, x + mc.font.width(label + ": "), y, valueColor, true);
+    }
+
+    private static String formatTime(long seconds) {
+        long hours = seconds / 3600L;
+        long minutes = (seconds % 3600L) / 60L;
+        long secs = seconds % 60L;
+        if ("Long".equals(SessionManagerState.timeFormat)) return hours + "h " + minutes + "m " + secs + "s";
+        return String.format("%02d:%02d:%02d", hours, minutes, secs);
+    }
+}

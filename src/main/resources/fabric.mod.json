@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "runal",
+	"version": "${version}",
+	"name": "Runal",
+	"description": "Client-side utility mod for ScepterRPG.",
+	"authors": [
+		"Lunah"
+	],
+	"contact": {
+		"homepage": "",
+		"sources": ""
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/runal/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.runal.Runal"
+		],
+		"client": [
+			"com.runal.client.RunalClient"
+		]
+	},
+	"mixins": [
+		"runal.mixins.json",
+		{
+			"config": "runal.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "${minecraft}",
+		"java": "${javaDepends}",
+		"fabric-api": "*"
+	}
+}
