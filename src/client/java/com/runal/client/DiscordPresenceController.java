@@ -47,7 +47,7 @@ public class DiscordPresenceController {
     }
 
     private static void updatePendingText() {
-        pendingDetails = "Conquering the World";
+        pendingDetails = "Exploring the World";
 
         boolean fightingBoss = BossTitleState.lastBossName != null
                 && System.currentTimeMillis() - BossTitleState.lastBossMessageMs < BOSS_FIGHT_HOLD_MS;
