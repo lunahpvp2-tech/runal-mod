@@ -24,7 +24,7 @@ public class BossTitleController {
             "Natuir",
             "Angel",
             "Flame Lord",
-            "Harbringer of Storms",
+            "Harbinger of Storms",
             "Ruinwing",
     };
 
