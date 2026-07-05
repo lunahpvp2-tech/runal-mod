@@ -26,6 +26,7 @@ public class BossTitleController {
             "Flame Lord",
             "Harbinger of Storms",
             "Ruinwing",
+            "Aeralith",
     };
 
     private static final int MAX_WORDS = 5;
