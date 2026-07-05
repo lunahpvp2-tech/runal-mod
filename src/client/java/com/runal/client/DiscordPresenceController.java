@@ -16,6 +16,7 @@ public class DiscordPresenceController {
     private static final String RUNAL_DISCORD = "https://discord.gg/G9JrtKjQdh";
     private static final long RECONNECT_INTERVAL_MS = 15_000L;
     private static final long MIN_UPDATE_INTERVAL_MS = 15_000L;
+    private static final long BOSS_FIGHT_HOLD_MS = 60_000L;
 
     private static final DiscordIpcClient client = new DiscordIpcClient();
     private static final AtomicBoolean running = new AtomicBoolean(true);
@@ -46,19 +47,20 @@ public class DiscordPresenceController {
     }
 
     private static void updatePendingText() {
-        if (BossTitleState.currentText != null && BossTitleState.currentBossName != null) {
-            pendingDetails = "Conquering the World";
-            pendingState = "Fighting " + BossTitleState.currentBossName;
+        pendingDetails = "Conquering the World";
+
+        boolean fightingBoss = BossTitleState.lastBossName != null
+                && System.currentTimeMillis() - BossTitleState.lastBossMessageMs < BOSS_FIGHT_HOLD_MS;
+        if (fightingBoss) {
+            pendingState = "Fighting " + BossTitleState.lastBossName + " in ScepterRPG";
             return;
         }
 
         if (!EventTrackerState.events.isEmpty()) {
-            pendingDetails = "Conquering the World";
             pendingState = EventTrackerState.events.values().iterator().next().name;
             return;
         }
 
-        pendingDetails = "Conquering the World";
         pendingState = null;
     }
 

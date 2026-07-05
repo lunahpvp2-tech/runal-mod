@@ -70,6 +70,9 @@ public class BossTitleController {
         BossTitleState.currentBossName = matcher.group(1);
         BossTitleState.currentText = firstWords(matcher.group(2), MAX_WORDS);
         BossTitleState.displayTicksRemaining = DISPLAY_TICKS;
+
+        BossTitleState.lastBossName = matcher.group(1);
+        BossTitleState.lastBossMessageMs = System.currentTimeMillis();
     }
 
     private static String firstWords(String text, int maxWords) {

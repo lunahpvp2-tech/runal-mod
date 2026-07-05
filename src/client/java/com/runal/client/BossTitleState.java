@@ -11,6 +11,9 @@ public class BossTitleState {
     public static String currentBossName;
     public static int displayTicksRemaining;
 
+    public static String lastBossName;
+    public static long lastBossMessageMs;
+
     public static void ensureDefaultPosition(int screenWidth, int screenHeight) {
         if (x == Integer.MIN_VALUE) x = screenWidth / 2;
         if (y == Integer.MIN_VALUE) y = screenHeight / 2;
