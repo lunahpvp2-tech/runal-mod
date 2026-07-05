@@ -14,7 +14,7 @@ public class AutoGGController {
             if (!AutoGGState.INSTANCE.isEnabled()) return;
             if (overlay) return;
 
-            String text = message.getString().trim();
+            String text = stripDecoration(message.getString().trim());
             if (!HAS_FOUND_PATTERN.matcher(text).matches()) return;
 
             Minecraft mc = Minecraft.getInstance();
@@ -25,5 +25,9 @@ public class AutoGGController {
 
             mc.getConnection().sendChat(response);
         });
+    }
+
+    private static String stripDecoration(String text) {
+        return text.replaceAll("^[\\p{So}\\p{Co}\\s]+", "");
     }
 }
