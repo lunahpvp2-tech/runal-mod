@@ -34,6 +34,8 @@ public class AutoGGController {
     }
 
     private static String stripDecoration(String text) {
-        return text.replaceAll("^[\\p{So}\\p{Co}\\s]+", "");
+        String cleaned = text.replaceAll("[\\p{So}\\p{Co}]", "");
+        cleaned = cleaned.replaceAll("\\p{Zs}", " ");
+        return cleaned.trim();
     }
 }
