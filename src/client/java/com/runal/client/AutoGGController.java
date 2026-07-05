@@ -14,8 +14,14 @@ public class AutoGGController {
             if (!AutoGGState.INSTANCE.isEnabled()) return;
             if (overlay) return;
 
-            String text = stripDecoration(message.getString().trim());
-            if (!HAS_FOUND_PATTERN.matcher(text).matches()) return;
+            boolean found = false;
+            for (String line : message.getString().split("\n")) {
+                if (HAS_FOUND_PATTERN.matcher(stripDecoration(line.trim())).matches()) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return;
 
             Minecraft mc = Minecraft.getInstance();
             if (mc.player == null || mc.getConnection() == null) return;
