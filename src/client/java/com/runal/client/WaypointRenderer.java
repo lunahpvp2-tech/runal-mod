@@ -148,8 +148,6 @@ public class WaypointRenderer {
             if (toBaseHorizLen <= CLOSE_RANGE) {
                 aimed = true;
             } else {
-                // World-space ray-vs-box test instead of screen projection - projecting the
-                // extreme AIM_Y_MIN/AIM_Y_MAX points off-screen made the old check fail at range.
                 AABB aimBox = new AABB(baseX - AIM_HALF_WIDTH, AIM_Y_MIN, baseZ - AIM_HALF_WIDTH,
                         baseX + AIM_HALF_WIDTH, AIM_Y_MAX, baseZ + AIM_HALF_WIDTH);
                 Vec3 viewVec = mc.player.getViewVector(1.0f);

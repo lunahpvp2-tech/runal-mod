@@ -492,7 +492,6 @@ public class RunalScreen extends Screen {
         }
     }
 
-
     private List<ModuleSetting> visibleSettings(Module module) {
         List<ModuleSetting> result = new ArrayList<>();
         addVisibleSettings(result, module.getSettings());
@@ -1006,13 +1005,4 @@ public class RunalScreen extends Screen {
         return false;
     }
 }
-
-
-
-
-
-
-
-
-
 

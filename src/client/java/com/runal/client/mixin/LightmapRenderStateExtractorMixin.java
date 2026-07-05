@@ -36,9 +36,7 @@ abstract class LightmapRenderStateExtractorMixin {
 }
 *///?}
 //? if 1.21.11 {
-/*// Real 1.21.11 dropped the DimensionSpecialEffects.forceBrightLightmap() hook this used on 1.21.4
-// and doesn't expose an equivalent lightmap-forcing method yet, so Fullbright is a no-op here for now.
-@Mixin(LightTexture.class)
+/*@Mixin(LightTexture.class)
 abstract class LightmapRenderStateExtractorMixin {
 
     @Inject(method = "tick", at = @At("HEAD"))

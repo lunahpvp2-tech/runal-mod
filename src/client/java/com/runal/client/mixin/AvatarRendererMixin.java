@@ -29,10 +29,8 @@ abstract class AvatarRendererMixin {
 
         boolean isSelf = entity == mc.player;
         if ("Self".equals(PlayerScaleState.INSTANCE.target)) {
-            // "Self" should only ever affect the local client's own model.
             if (!isSelf) return;
         } else if (!isSelf && !RealPlayerTracker.isVerifiedRealPlayer(entity.getUUID())) {
-            // "Everyone" means every genuine player - never an NPC impersonating one.
             return;
         }
 

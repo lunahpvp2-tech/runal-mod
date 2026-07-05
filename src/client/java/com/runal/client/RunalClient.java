@@ -423,5 +423,3 @@ public class RunalClient implements ClientModInitializer {
 	}
 }
 
-
-

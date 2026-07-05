@@ -11,13 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-// This server spawns NPCs (via Skript) as fake Player-type entities with a real tab-list entry
-// and a random UUID, so neither "is it a Player instance", "does it have a tab-list entry", nor
-// "is its UUID version 4" can tell a real player apart from one of these NPCs. What a script can't
-// easily fake is the vanilla keep-alive protocol: a real client's tab-list ping is recalculated by
-// the server periodically and will change over time, while a scripted NPC's tab entry is written
-// once and left alone. Treat a UUID as belonging to a genuine player only once we've observed its
-// ping value actually change.
 public class RealPlayerTracker {
     private static final Map<UUID, Integer> lastPing = new HashMap<>();
     private static final Set<UUID> verified = new HashSet<>();

@@ -159,10 +159,6 @@ public class UtilityHudRenderer {
             ItemStack stack = slot.getItem();
             if (!mc.player.getCooldowns().isOnCooldown(stack)) continue;
 
-            // Dedupe by the item's exact display name rather than its cooldown group: this
-            // server reuses the same underlying item/block for multiple custom items that only
-            // differ by resource-pack texture and name, so they share a cooldown group but are
-            // meant to be tracked as distinct items.
             String name = stack.getHoverName().getString();
             if (!seenNames.add(name)) continue;
 

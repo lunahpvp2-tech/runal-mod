@@ -9,13 +9,7 @@ base.archivesName = property("mod.id") as String
 
 val requiredJava: JavaVersion = JavaVersion.toVersion(sc.properties.get<String>("mod.java_major"))
 
-// Source is written against the 26.1.2 API; these renames map 1:1 onto the real Yarn-era names
-// (1.21.4 and 1.21.11 share the same API surface here) with identical behaviour, so a straight
-// identifier swap is enough (no //? if needed).
 val is1214 = sc.current.version == "1.21.4" || sc.current.version == "1.21.11"
-// A handful of renames (ResourceLocation, PlayerRenderer, RenderType, getPosition/getXRot/getYRot,
-// getName/getId) only actually happened in 1.21.4 - Mojang reverted or never made these changes by
-// 1.21.11, so on 1.21.11 those specific APIs still match the fictional 26.1.2 style.
 val only1214 = sc.current.version == "1.21.4"
 sc.replacements {
     string {
@@ -31,9 +25,6 @@ sc.replacements {
         replace("AvatarRenderState", "PlayerRenderState")
     }
     regex {
-        // Negative lookahead avoids matching "AvatarRendererMixin" (the mixin class's own name,
-        // which must stay stable across versions since runal.client.mixins.json references
-        // it literally and isn't itself run through this text-swap pipeline).
         direction.set(only1214)
         replace("""AvatarRenderer(?!Mixin)""", "PlayerRenderer", """PlayerRenderer(?!Mixin)""", "AvatarRenderer")
     }
@@ -96,7 +87,6 @@ sc.replacements {
 }
 
 repositories {
-    // Add repositories to retrieve artifacts from in here.
 }
 
 loom {
@@ -112,13 +102,11 @@ loom {
 
 dependencies {
     minecraft("com.mojang:minecraft:${sc.current.version}")
-    // Applies Mojang's official mappings; loom-back-compat picks the matching Loom variant per version.
     loomx.applyMojangMappings()
 
     modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader") as String}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${sc.properties.get<String>("deps.fabric_api")}")
 
-    // MixinExtras - needed for @ModifyExpressionValue and similar advanced mixin injectors
     implementation("io.github.llamalad7:mixinextras-fabric:0.5.2")
     annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.5.2")
 }

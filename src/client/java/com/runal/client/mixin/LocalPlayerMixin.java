@@ -9,10 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class LocalPlayerMixin {
 
     //? if 1.21.4 {
-    /*// Real 1.21.4's aiStep() doesn't read Input.sprint() directly (unlike 1.21.11/26.1.2) - it
-    // checks the sprint KeyMapping.isDown() twice instead, each immediately followed by
-    // setSprinting(), so that's the equivalent "is the sprint key held" signal to override here.
-    @ModifyExpressionValue(
+    /*@ModifyExpressionValue(
             method = "aiStep",
             at = @At(
                     value = "INVOKE",

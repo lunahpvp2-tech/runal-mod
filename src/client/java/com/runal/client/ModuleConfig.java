@@ -42,8 +42,6 @@ public class ModuleConfig {
         return props;
     }
 
-    // The HUD editor drags these widgets by writing straight to each state class's x/y fields
-    // rather than through a registered ModuleSetting, so they need their own save/load here.
     private static void saveHudPositions(Properties props) {
         props.setProperty("hud.session.x", String.valueOf(SessionManagerState.x));
         props.setProperty("hud.session.y", String.valueOf(SessionManagerState.y));

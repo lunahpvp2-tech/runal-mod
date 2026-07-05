@@ -16,10 +16,6 @@ public interface ModuleSetting {
     default void deserialize(String value) {
     }
 
-    /**
-     * Restores this setting to the value it had when constructed.
-     * No-op by default - override for settings that hold a persisted value.
-     */
     default void resetToDefault() {
     }
 }

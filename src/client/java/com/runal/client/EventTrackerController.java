@@ -15,18 +15,12 @@ public class EventTrackerController {
     private static final Pattern APPEARED_PATTERN = Pattern.compile("^(.+) has appeared$");
     private static final Pattern DURATION_PATTERN = Pattern.compile("^Duration: (\\d+) minutes?$");
     private static final Pattern SPAWN_PATTERN = Pattern.compile("^Spawn: (\\d+) minutes?$");
-    // Fallback for announcement lines that mention a countdown in prose (e.g. "Golden fragments
-    // will fall in 5 minutes,") instead of the "Spawn: N minutes" / "Duration: N minutes" format.
     private static final Pattern GENERIC_MINUTES_PATTERN = Pattern.compile("^.*?\\b(\\d+) minutes?\\b.*$");
 
     private static final long PENDING_WINDOW_MS = 3000L;
 
-    // First "N minutes" line after a forming/ongoing trigger sets the event's current countdown.
     private static String pendingDurationFor;
     private static long pendingSince;
-    // A second "N minutes" line right after that (e.g. "granting everyone 1.25x Luck for 15
-    // minutes!" following "Golden fragments will fall in 5 minutes,") is the duration for the
-    // event's next phase once the first countdown ends, so the event doesn't just vanish then.
     private static String pendingNextPhaseFor;
     private static long pendingNextPhaseSince;
 
@@ -61,8 +55,6 @@ public class EventTrackerController {
                 int seconds = minutesInLine * 60;
                 EventTrackerState.put(pendingDurationFor, seconds);
                 EventTrackerState.knownDurationSeconds.put(pendingDurationFor, seconds);
-                // A follow-up line might still give the event's next-phase duration (e.g. how
-                // long the buff lasts once this countdown ends), so keep waiting for one.
                 pendingNextPhaseFor = pendingDurationFor;
                 pendingNextPhaseSince = System.currentTimeMillis();
                 pendingDurationFor = null;
@@ -125,9 +117,6 @@ public class EventTrackerController {
         return null;
     }
 
-    // Server event announcements are often wrapped in decorative symbols (e.g. "✦ A Gilded
-    // Starfall is forming... ✦") that break the exact-anchor patterns above. Strip leading/trailing
-    // decoration and trailing ellipses so the underlying sentence can still be matched.
     private static String stripDecoration(String text) {
         String cleaned = text.replaceAll("\\p{So}", "").trim();
         cleaned = cleaned.replaceAll("^[\\s\\-=~*•●■□▪▫◆♦➤<>|]+", "");

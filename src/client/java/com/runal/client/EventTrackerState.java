@@ -13,9 +13,6 @@ public class EventTrackerState {
     public static class TrackedEvent {
         public String name;
         public int remainingSeconds;
-        // Some events run in two phases from a single announcement (e.g. "forming" for 5 minutes,
-        // then active for 15 once it starts). Once remainingSeconds hits 0, if this is set, it
-        // becomes the new remainingSeconds instead of the event being removed.
         public Integer nextPhaseSeconds;
 
         public TrackedEvent(String name, int remainingSeconds) {

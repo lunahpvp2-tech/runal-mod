@@ -25,9 +25,6 @@ abstract class HidePlayersMixin {
         if (entity == mc.player) return;
         if (mc.getConnection() == null) return;
 
-        // This server's NPCs (spawned via Skript) are fake Player-type entities with their own
-        // tab-list entry and a random UUID, so neither of those alone can tell them apart from a
-        // real player. See RealPlayerTracker for how we do it instead.
         if (!RealPlayerTracker.isVerifiedRealPlayer(entity.getUUID())) return;
 
         cir.setReturnValue(false);
