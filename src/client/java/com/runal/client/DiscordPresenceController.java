@@ -52,7 +52,7 @@ public class DiscordPresenceController {
         boolean fightingBoss = BossTitleState.lastBossName != null
                 && System.currentTimeMillis() - BossTitleState.lastBossMessageMs < BOSS_FIGHT_HOLD_MS;
         if (fightingBoss) {
-            pendingState = "Fighting " + BossTitleState.lastBossName + " in ScepterRPG";
+            pendingState = "Fighting " + BossTitleState.lastBossName + " in Scepter";
             return;
         }
 
