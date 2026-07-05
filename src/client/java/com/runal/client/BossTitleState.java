@@ -8,6 +8,7 @@ public class BossTitleState {
     public static float scale = 2.5f;
 
     public static String currentText;
+    public static String currentBossName;
     public static int displayTicksRemaining;
 
     public static void ensureDefaultPosition(int screenWidth, int screenHeight) {

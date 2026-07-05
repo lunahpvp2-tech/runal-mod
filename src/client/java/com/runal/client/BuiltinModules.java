@@ -278,6 +278,15 @@ public class BuiltinModules {
         });
 
         ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of();
+            public String getName() { return "DiscordRPC"; }
+            public String getCategory() { return "Misc"; }
+            public boolean isEnabled() { return DiscordPresenceState.enabled; }
+            public void toggle() { DiscordPresenceState.enabled = !DiscordPresenceState.enabled; }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
             private final List<ModuleSetting> settings = List.of(
                     new ToggleModuleSetting("Glow", () -> TeamTrackerState.INSTANCE.glowEnabled, v -> TeamTrackerState.INSTANCE.glowEnabled = v),
                     new ColorModuleSetting("Marker Color", () -> TeamTrackerState.INSTANCE.markerColor, v -> TeamTrackerState.INSTANCE.markerColor = v),

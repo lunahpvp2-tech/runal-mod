@@ -40,7 +40,7 @@ public class BossTitleController {
             if (i > 0) names.append('|');
             names.append(Pattern.quote(BOSS_NAMES[i]));
         }
-        return Pattern.compile("^(?:\\[[^\\]]*]\\s*)*(?:" + names + ")\\s*\\[[^\\]]*]\\s*:\\s*(.+)$");
+        return Pattern.compile("^(?:\\[[^\\]]*]\\s*)*(" + names + ")\\s*\\[[^\\]]*]\\s*:\\s*(.+)$");
     }
 
     public static void register() {
@@ -54,6 +54,7 @@ public class BossTitleController {
                 BossTitleState.displayTicksRemaining--;
                 if (BossTitleState.displayTicksRemaining == 0) {
                     BossTitleState.currentText = null;
+                    BossTitleState.currentBossName = null;
                 }
             }
         });
@@ -65,7 +66,8 @@ public class BossTitleController {
         Matcher matcher = BOSS_LINE_PATTERN.matcher(text);
         if (!matcher.matches()) return;
 
-        BossTitleState.currentText = firstWords(matcher.group(1), MAX_WORDS);
+        BossTitleState.currentBossName = matcher.group(1);
+        BossTitleState.currentText = firstWords(matcher.group(2), MAX_WORDS);
         BossTitleState.displayTicksRemaining = DISPLAY_TICKS;
     }
 
