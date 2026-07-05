@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class AutoGGController {
 
-    private static final Pattern HAS_FOUND_PATTERN = Pattern.compile("^([A-Za-z0-9_]{1,16}) has found ([A-Za-z0-9_]{1,16})!$");
+    private static final Pattern HAS_FOUND_PATTERN = Pattern.compile("^([A-Za-z0-9_]{1,16}) has found (.+)!$");
 
     public static void register() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
