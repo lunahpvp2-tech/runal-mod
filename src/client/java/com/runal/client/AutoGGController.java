@@ -52,6 +52,14 @@ public class AutoGGController {
         Matcher matcher = HAS_FOUND_PATTERN.matcher(fullText);
         if (!matcher.find()) return false;
 
+        // Some servers send legacy section-sign color codes embedded directly in the message
+        // text instead of real styled components, in which case the Style-based check below
+        // never sees a color at all. Check for that first since it's cheap and exact.
+        String itemSegment = fullText.substring(matcher.start(2), matcher.end(2));
+        if (containsLegacyCode(itemSegment, '5')) return AutoGGState.INSTANCE.triggerEpic;
+        if (containsLegacyCode(itemSegment, '6')) return AutoGGState.INSTANCE.triggerLegendary;
+        if (containsLegacyCode(itemSegment, 'd')) return AutoGGState.INSTANCE.triggerMythical;
+
         int itemStart = matcher.start(2);
         Style itemStyle = null;
         for (int i = 0; i < ranges.size(); i++) {
@@ -67,6 +75,11 @@ public class AutoGGController {
         if (isRarity(itemStyle, ChatFormatting.GOLD)) return AutoGGState.INSTANCE.triggerLegendary;
         if (isRarity(itemStyle, ChatFormatting.LIGHT_PURPLE)) return AutoGGState.INSTANCE.triggerMythical;
         return false;
+    }
+
+    private static boolean containsLegacyCode(String text, char colorCode) {
+        String lower = text.toLowerCase();
+        return lower.contains("§" + colorCode) && lower.contains("§l");
     }
 
     private static boolean isRarity(Style style, ChatFormatting expected) {

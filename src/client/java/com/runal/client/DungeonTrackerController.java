@@ -2,7 +2,14 @@ package com.runal.client;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,18 +19,32 @@ public class DungeonTrackerController {
             "Normal", "Normal", "Normal", "Boss", "Treasure",
     };
 
-    private static final Pattern ROOM_PATTERN = Pattern.compile("^(.+?)\\s*[-–—]\\s*Room (\\d+)$");
+    private static final Map<String, String> DUNGEON_BOSS_NAMES = Map.of(
+            "Forest Dungeon", "Spider Queen",
+            "Divine Catacombs", "Great Paladin",
+            "Heart of the Divine", "Divine Guardian"
+    );
+
+    private static final Pattern ROOM_PATTERN = Pattern.compile("^(.+?)\\s*[-–—]\\s*Room (\\d+)$", Pattern.MULTILINE);
+    private static final Pattern CANCELLED_PATTERN = Pattern.compile("^.+? run cancelled\\.?$", Pattern.MULTILINE);
     private static final long TIMEOUT_MS = 60_000L;
 
     private static int tickCounter = 0;
 
+    private record StyledRun(String text, Style style) {
+    }
+
     public static void register() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
             if (overlay) return;
-            handleMessage(stripDecoration(message.getString().trim()));
+            handleMessage(message);
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.player != null && client.player.getHealth() <= 0f) {
+                DungeonTrackerState.dungeonName = null;
+            }
+
             tickCounter++;
             if (tickCounter >= 20) {
                 tickCounter = 0;
@@ -33,15 +54,51 @@ public class DungeonTrackerController {
                 }
             }
         });
+
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> DungeonTrackerState.dungeonName = null);
     }
 
-    private static void handleMessage(String text) {
-        Matcher matcher = ROOM_PATTERN.matcher(text);
-        if (!matcher.matches()) return;
+    private static void handleMessage(Component message) {
+        List<StyledRun> runs = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        List<int[]> ranges = new ArrayList<>();
 
-        DungeonTrackerState.dungeonName = matcher.group(1).trim();
+        message.visit((style, text) -> {
+            String cleaned = stripDecoration(text);
+            int start = sb.length();
+            sb.append(cleaned);
+            ranges.add(new int[]{start, sb.length()});
+            runs.add(new StyledRun(cleaned, style));
+            return Optional.<Void>empty();
+        }, Style.EMPTY);
+
+        String fullText = sb.toString();
+
+        if (CANCELLED_PATTERN.matcher(fullText).find()) {
+            DungeonTrackerState.dungeonName = null;
+            return;
+        }
+
+        Matcher matcher = ROOM_PATTERN.matcher(fullText);
+        if (!matcher.find()) return;
+
+        String name = matcher.group(1).trim();
+        DungeonTrackerState.dungeonName = name;
         DungeonTrackerState.currentRoom = Integer.parseInt(matcher.group(2));
         DungeonTrackerState.lastMessageMs = System.currentTimeMillis();
+        DungeonTrackerState.bossName = DUNGEON_BOSS_NAMES.getOrDefault(name, "Boss");
+
+        int nameStart = matcher.start(1);
+        for (int i = 0; i < ranges.size(); i++) {
+            int[] range = ranges.get(i);
+            if (nameStart >= range[0] && nameStart < range[1]) {
+                Style style = runs.get(i).style;
+                if (style.getColor() != null) {
+                    DungeonTrackerState.themeColor = 0xFF000000 | (style.getColor().getValue() & 0xFFFFFF);
+                }
+                break;
+            }
+        }
     }
 
     public static int roomsUntil(String type) {
@@ -54,8 +111,7 @@ public class DungeonTrackerController {
     }
 
     private static String stripDecoration(String text) {
-        String cleaned = text.replaceAll("[\\p{So}\\p{Co}]", "");
-        cleaned = cleaned.replaceAll("\\p{Zs}", " ");
-        return cleaned.trim();
+        String cleaned = text.replaceAll("[\\p{So}\\p{Co}|]", "");
+        return cleaned.replaceAll("\\p{Zs}", " ");
     }
 }

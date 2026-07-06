@@ -8,6 +8,8 @@ public class DungeonTrackerState {
     public static int valueColor = 0xFFFFFFFF;
 
     public static String dungeonName;
+    public static String bossName = "Boss";
+    public static Integer themeColor;
     public static int currentRoom;
     public static long lastMessageMs;
 }

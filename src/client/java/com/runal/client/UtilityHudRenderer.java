@@ -212,22 +212,24 @@ public class UtilityHudRenderer {
         String parkourStr = roomsUntilParkour == 0 ? "Now" : roomsUntilParkour + " rooms";
         String bossStr = roomsUntilBoss == 0 ? "Now" : roomsUntilBoss + " rooms";
         String chestStr = roomsUntilTreasure == 0 ? "Now" : roomsUntilTreasure + " rooms";
+        int color = DungeonTrackerState.themeColor != null ? DungeonTrackerState.themeColor : DungeonTrackerState.nameColor;
+        int valueColor = DungeonTrackerState.themeColor != null ? DungeonTrackerState.themeColor : DungeonTrackerState.valueColor;
 
         int w = 60;
         w = Math.max(w, mc.font.width("Dungeon: " + DungeonTrackerState.dungeonName) + 12);
         w = Math.max(w, mc.font.width("Room: " + roomStr) + 12);
         w = Math.max(w, mc.font.width("Parkour: " + parkourStr) + 12);
-        w = Math.max(w, mc.font.width("Boss: " + bossStr) + 12);
-        w = Math.max(w, mc.font.width("Chest: " + chestStr) + 12);
+        w = Math.max(w, mc.font.width(DungeonTrackerState.bossName + ": " + bossStr) + 12);
+        w = Math.max(w, mc.font.width("Treasure Chest: " + chestStr) + 12);
         int h = Math.max(16, 5 * 11 + 8);
 
         drawPanel(graphics, DungeonTrackerState.x, DungeonTrackerState.y, w, h, 0xAA101216);
         int y = DungeonTrackerState.y + 5;
-        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Dungeon", DungeonTrackerState.dungeonName, DungeonTrackerState.nameColor, DungeonTrackerState.valueColor); y += 11;
-        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Room", roomStr, DungeonTrackerState.nameColor, DungeonTrackerState.valueColor); y += 11;
-        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Parkour", parkourStr, DungeonTrackerState.nameColor, DungeonTrackerState.valueColor); y += 11;
-        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Boss", bossStr, DungeonTrackerState.nameColor, DungeonTrackerState.valueColor); y += 11;
-        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Chest", chestStr, DungeonTrackerState.nameColor, DungeonTrackerState.valueColor);
+        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Dungeon", DungeonTrackerState.dungeonName, color, valueColor); y += 11;
+        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Room", roomStr, color, valueColor); y += 11;
+        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Parkour", parkourStr, color, valueColor); y += 11;
+        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, DungeonTrackerState.bossName, bossStr, color, valueColor); y += 11;
+        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Treasure Chest", chestStr, color, valueColor);
     }
 
     private static void drawArmor(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
