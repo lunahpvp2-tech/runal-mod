@@ -57,12 +57,10 @@ public class AutoGGController {
         int itemStart = foundIdx + FOUND_MARKER.length();
 
         String itemSegment = fullText.substring(itemStart);
-        // &6 (gold) = legendary confirmed working. &d (light purple, bright pink) = epic and
-        // &5 (dark purple, duller) = mythical - swapped from the original spec once a real find
-        // showed epic items are the bright pink one, not the dark purple one.
+        // &6 (gold) = legendary, &5 (dark purple) = epic, &d (light purple) = mythical.
         if (containsLegacyCode(itemSegment, '6')) return AutoGGState.INSTANCE.triggerLegendary;
-        if (containsLegacyCode(itemSegment, 'd')) return AutoGGState.INSTANCE.triggerEpic;
-        if (containsLegacyCode(itemSegment, '5')) return AutoGGState.INSTANCE.triggerMythical;
+        if (containsLegacyCode(itemSegment, '5')) return AutoGGState.INSTANCE.triggerEpic;
+        if (containsLegacyCode(itemSegment, 'd')) return AutoGGState.INSTANCE.triggerMythical;
 
         Style itemStyle = null;
         for (int i = 0; i < ranges.size(); i++) {
@@ -75,8 +73,8 @@ public class AutoGGController {
         if (itemStyle == null) return false;
 
         if (isRarity(itemStyle, ChatFormatting.GOLD)) return AutoGGState.INSTANCE.triggerLegendary;
-        if (isRarity(itemStyle, ChatFormatting.LIGHT_PURPLE)) return AutoGGState.INSTANCE.triggerEpic;
-        if (isRarity(itemStyle, ChatFormatting.DARK_PURPLE)) return AutoGGState.INSTANCE.triggerMythical;
+        if (isRarity(itemStyle, ChatFormatting.DARK_PURPLE)) return AutoGGState.INSTANCE.triggerEpic;
+        if (isRarity(itemStyle, ChatFormatting.LIGHT_PURPLE)) return AutoGGState.INSTANCE.triggerMythical;
         return false;
     }
 
