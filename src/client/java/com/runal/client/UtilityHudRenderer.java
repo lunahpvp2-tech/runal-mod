@@ -64,6 +64,10 @@ public class UtilityHudRenderer {
             drawItemCooldowns(graphics, mc);
         }
 
+        if (ArmorCooldownHudState.enabled && !ArmorCooldownHudState.names.isEmpty()) {
+            drawArmorCooldowns(graphics, mc);
+        }
+
         if (EventTrackerState.enabled && !EventTrackerState.events.isEmpty()) {
             int lines = EventTrackerState.events.size();
             int h = Math.max(16, lines * 11 + 8);
@@ -179,6 +183,24 @@ public class UtilityHudRenderer {
         int y = ItemCooldownHudState.y + 5;
         for (int i = 0; i < names.size(); i++) {
             drawLine(graphics, mc, ItemCooldownHudState.x + 6, y, names.get(i), percents.get(i) + "%", ItemCooldownHudState.nameColor, ItemCooldownHudState.valueColor);
+            y += 11;
+        }
+    }
+
+    private static void drawArmorCooldowns(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
+        List<String> names = ArmorCooldownHudState.names;
+        List<Integer> percents = ArmorCooldownHudState.percents;
+
+        int h = Math.max(16, names.size() * 11 + 8);
+        int w = 60;
+        for (int i = 0; i < names.size(); i++) {
+            w = Math.max(w, mc.font.width(names.get(i) + ": " + percents.get(i) + "%") + 12);
+        }
+
+        drawPanel(graphics, ArmorCooldownHudState.x, ArmorCooldownHudState.y, w, h, 0xAA101216);
+        int y = ArmorCooldownHudState.y + 5;
+        for (int i = 0; i < names.size(); i++) {
+            drawLine(graphics, mc, ArmorCooldownHudState.x + 6, y, names.get(i), percents.get(i) + "%", ArmorCooldownHudState.nameColor, ArmorCooldownHudState.valueColor);
             y += 11;
         }
     }

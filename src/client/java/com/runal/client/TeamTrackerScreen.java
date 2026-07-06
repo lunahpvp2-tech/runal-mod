@@ -16,6 +16,19 @@ import java.util.UUID;
 public class TeamTrackerScreen extends Screen {
     private static final int ROW_HEIGHT = 20;
     private static final int LIST_TOP = 40;
+    private static final int SWATCH_SIZE = 14;
+
+    private static final int[] PALETTE = {
+            0xFF35D77A,
+            0xFFFF5C5C,
+            0xFFFFA23C,
+            0xFFFFE066,
+            0xFF66D9FF,
+            0xFF5C7CFF,
+            0xFFB366FF,
+            0xFFFF6FD8,
+            0xFFFFFFFF,
+    };
 
     private List<PlayerInfo> players = List.of();
     private double scroll;
@@ -80,11 +93,18 @@ public class TeamTrackerScreen extends Screen {
             boolean teammate = TeamTrackerState.INSTANCE.isTeammate(id);
             boolean hovered = mouseX >= listX && mouseX <= listX + listWidth && mouseY >= rowY && mouseY <= rowY + ROW_HEIGHT - 2;
 
-            int bg = teammate ? 0x5535D77A : (hovered ? 0x55202226 : 0x33101216);
+            int rowColor = teammate ? TeamTrackerState.INSTANCE.getTeammateColor(id) : 0xFF35D77A;
+            int bg = teammate ? 0x55000000 | (rowColor & 0xFFFFFF) : (hovered ? 0x55202226 : 0x33101216);
             context.fill(listX, rowY, listX + listWidth, rowY + ROW_HEIGHT - 2, bg);
-            context.outline(listX, rowY, listWidth, ROW_HEIGHT - 2, teammate ? 0xFF35D77A : 0x33FFFFFF);
+            context.outline(listX, rowY, listWidth, ROW_HEIGHT - 2, teammate ? rowColor : 0x33FFFFFF);
             context.text(font, info.getProfile().name(), listX + 8, rowY + 5, 0xFFFFFFFF, true);
-            context.text(font, teammate ? "Teammate" : "", listX + listWidth - 60, rowY + 5, 0xFF35D77A, true);
+
+            if (teammate) {
+                int swatchX = listX + listWidth - SWATCH_SIZE - 6;
+                int swatchY = rowY + (ROW_HEIGHT - 2 - SWATCH_SIZE) / 2;
+                context.fill(swatchX, swatchY, swatchX + SWATCH_SIZE, swatchY + SWATCH_SIZE, 0xFF000000 | (rowColor & 0xFFFFFF));
+                context.outline(swatchX, swatchY, SWATCH_SIZE, SWATCH_SIZE, 0xFFFFFFFF);
+            }
         }
 
         context.disableScissor();
@@ -114,12 +134,30 @@ public class TeamTrackerScreen extends Screen {
                 int rowY = LIST_TOP + i * ROW_HEIGHT - (int) scroll;
                 if (mouseY >= rowY && mouseY <= rowY + ROW_HEIGHT - 2) {
                     UUID id = players.get(i).getProfile().id();
-                    TeamTrackerState.INSTANCE.setTeammate(id, !TeamTrackerState.INSTANCE.isTeammate(id));
+                    boolean teammate = TeamTrackerState.INSTANCE.isTeammate(id);
+
+                    int swatchX = listX + listWidth - SWATCH_SIZE - 6;
+                    int swatchY = rowY + (ROW_HEIGHT - 2 - SWATCH_SIZE) / 2;
+                    boolean onSwatch = mouseX >= swatchX && mouseX <= swatchX + SWATCH_SIZE
+                            && mouseY >= swatchY && mouseY <= swatchY + SWATCH_SIZE;
+
+                    if (teammate && onSwatch) {
+                        TeamTrackerState.INSTANCE.setTeammateColor(id, nextPaletteColor(TeamTrackerState.INSTANCE.getTeammateColor(id)));
+                    } else {
+                        TeamTrackerState.INSTANCE.setTeammate(id, !teammate);
+                    }
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private static int nextPaletteColor(int current) {
+        for (int i = 0; i < PALETTE.length; i++) {
+            if (PALETTE[i] == current) return PALETTE[(i + 1) % PALETTE.length];
+        }
+        return PALETTE[0];
     }
 
     @Override

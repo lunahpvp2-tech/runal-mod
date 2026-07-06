@@ -20,4 +20,13 @@ public abstract class EntityGlowMixin {
             cir.setReturnValue(true);
         }
     }
+
+    @Inject(method = "getTeamColor", at = @At("RETURN"), cancellable = true)
+    private void runal$teamColor(CallbackInfoReturnable<Integer> cir) {
+        if (!TeamTrackerState.INSTANCE.isEnabled()) return;
+
+        if ((Object) this instanceof Player player && TeamTrackerState.INSTANCE.isTeammate(player.getUUID())) {
+            cir.setReturnValue(TeamTrackerState.INSTANCE.getTeammateColor(player.getUUID()) & 0xFFFFFF);
+        }
+    }
 }

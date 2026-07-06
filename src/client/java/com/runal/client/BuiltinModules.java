@@ -97,6 +97,9 @@ public class BuiltinModules {
         ModuleManager.register(new Module() {
             private final List<ModuleSetting> settings = List.of(
                     new TextModuleSetting("Response", () -> AutoGGState.INSTANCE.response, v -> AutoGGState.INSTANCE.response = v),
+                    new ToggleModuleSetting("Epic", () -> AutoGGState.INSTANCE.triggerEpic, v -> AutoGGState.INSTANCE.triggerEpic = v),
+                    new ToggleModuleSetting("Legendary", () -> AutoGGState.INSTANCE.triggerLegendary, v -> AutoGGState.INSTANCE.triggerLegendary = v),
+                    new ToggleModuleSetting("Mythical", () -> AutoGGState.INSTANCE.triggerMythical, v -> AutoGGState.INSTANCE.triggerMythical = v),
                     new KeybindModuleSetting(RunalClient.getAutoGGKey())
             );
             public String getName() { return "Auto GG"; }
@@ -243,10 +246,22 @@ public class BuiltinModules {
                     new ColorModuleSetting("Name Color", () -> ItemCooldownHudState.nameColor, v -> ItemCooldownHudState.nameColor = v),
                     new ColorModuleSetting("Value Color", () -> ItemCooldownHudState.valueColor, v -> ItemCooldownHudState.valueColor = v)
             );
-            public String getName() { return "Item Cooldowns"; }
+            public String getName() { return "Weapons Cooldown"; }
             public String getCategory() { return "Tracking"; }
             public boolean isEnabled() { return ItemCooldownHudState.enabled; }
             public void toggle() { ItemCooldownHudState.enabled = !ItemCooldownHudState.enabled; }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
+                    new ColorModuleSetting("Name Color", () -> ArmorCooldownHudState.nameColor, v -> ArmorCooldownHudState.nameColor = v),
+                    new ColorModuleSetting("Value Color", () -> ArmorCooldownHudState.valueColor, v -> ArmorCooldownHudState.valueColor = v)
+            );
+            public String getName() { return "Armor Cooldown"; }
+            public String getCategory() { return "Tracking"; }
+            public boolean isEnabled() { return ArmorCooldownHudState.enabled; }
+            public void toggle() { ArmorCooldownHudState.enabled = !ArmorCooldownHudState.enabled; }
             public List<ModuleSetting> getSettings() { return settings; }
         });
 

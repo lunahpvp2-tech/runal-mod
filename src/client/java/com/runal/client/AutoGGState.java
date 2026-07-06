@@ -5,6 +5,9 @@ public class AutoGGState {
 
     private boolean enabled = false;
     public String response = "gg";
+    public boolean triggerEpic = true;
+    public boolean triggerLegendary = true;
+    public boolean triggerMythical = true;
 
     private AutoGGState() {}
 

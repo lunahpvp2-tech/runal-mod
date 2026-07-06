@@ -78,7 +78,7 @@ public class TeamTrackerRenderer {
             poseStack.scale(-0.025f, -0.025f, 0.025f);
 
             int textWidth = font.width(name);
-            font.drawInBatch(name, -textWidth / 2f, 0, TeamTrackerState.INSTANCE.markerColor, false,
+            font.drawInBatch(name, -textWidth / 2f, 0, TeamTrackerState.INSTANCE.getTeammateColor(player.getUUID()), false,
                     poseStack.last().pose(), bufferSource, Font.DisplayMode.SEE_THROUGH, 0, 0xF000F0);
 
             poseStack.popPose();
