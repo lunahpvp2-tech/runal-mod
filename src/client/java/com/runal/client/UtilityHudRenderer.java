@@ -171,7 +171,7 @@ public class UtilityHudRenderer {
     private static void drawCooldowns(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
         List<CooldownEntry> entries = new ArrayList<>();
 
-        if (ItemCooldownHudState.enabled && mc.player != null) {
+        if (ItemCooldownHudState.enabled && mc.player != null && mc.player.containerMenu == mc.player.inventoryMenu) {
             Set<String> seenNames = new HashSet<>();
             for (int slotId = InventoryMenu.INV_SLOT_START; slotId < InventoryMenu.USE_ROW_SLOT_END; slotId++) {
                 Slot slot = mc.player.containerMenu.getSlot(slotId);
