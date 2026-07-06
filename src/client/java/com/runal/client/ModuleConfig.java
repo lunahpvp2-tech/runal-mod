@@ -55,6 +55,8 @@ public class ModuleConfig {
         props.setProperty("hud.item_cooldowns.y", String.valueOf(ItemCooldownHudState.y));
         props.setProperty("hud.armor_cooldowns.x", String.valueOf(ArmorCooldownHudState.x));
         props.setProperty("hud.armor_cooldowns.y", String.valueOf(ArmorCooldownHudState.y));
+        props.setProperty("hud.accessory_cooldowns.x", String.valueOf(AccessoryCooldownState.x));
+        props.setProperty("hud.accessory_cooldowns.y", String.valueOf(AccessoryCooldownState.y));
         props.setProperty("hud.low_hp_title.x", String.valueOf(LowHealthWarning.lowTitleX));
         props.setProperty("hud.low_hp_title.y", String.valueOf(LowHealthWarning.lowTitleY));
         props.setProperty("hud.mid_hp_title.x", String.valueOf(LowHealthWarning.midTitleX));
@@ -76,6 +78,8 @@ public class ModuleConfig {
         ItemCooldownHudState.y = getInt(props, "hud.item_cooldowns.y", ItemCooldownHudState.y);
         ArmorCooldownHudState.x = getInt(props, "hud.armor_cooldowns.x", ArmorCooldownHudState.x);
         ArmorCooldownHudState.y = getInt(props, "hud.armor_cooldowns.y", ArmorCooldownHudState.y);
+        AccessoryCooldownState.x = getInt(props, "hud.accessory_cooldowns.x", AccessoryCooldownState.x);
+        AccessoryCooldownState.y = getInt(props, "hud.accessory_cooldowns.y", AccessoryCooldownState.y);
         LowHealthWarning.lowTitleX = getInt(props, "hud.low_hp_title.x", LowHealthWarning.lowTitleX);
         LowHealthWarning.lowTitleY = getInt(props, "hud.low_hp_title.y", LowHealthWarning.lowTitleY);
         LowHealthWarning.midTitleX = getInt(props, "hud.mid_hp_title.x", LowHealthWarning.midTitleX);

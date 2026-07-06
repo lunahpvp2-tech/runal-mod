@@ -45,6 +45,7 @@ public class HudEditorScreen extends Screen {
         drawWidget(context, "Events", EventTrackerState.x, EventTrackerState.y, 100, 40, 0xAA101216);
         drawWidget(context, "Weapons Cooldown", ItemCooldownHudState.x, ItemCooldownHudState.y, 100, 40, 0xAA101216);
         drawWidget(context, "Armor Cooldown", ArmorCooldownHudState.x, ArmorCooldownHudState.y, 100, 40, 0xAA101216);
+        drawWidget(context, "Accessory Cooldown", AccessoryCooldownState.x, AccessoryCooldownState.y, 100, 40, 0xAA101216);
 
         String lowTitlePreview = LowHealthWarning.lowHpTitle.isEmpty() ? "LOW HP" : LowHealthWarning.lowHpTitle;
         int lowTitleW = (int) (font.width(lowTitlePreview) * UtilityHudRenderer.WARNING_TITLE_SCALE);
@@ -108,6 +109,7 @@ public class HudEditorScreen extends Screen {
         if (inside(mouseX, mouseY, EventTrackerState.x, EventTrackerState.y, 100, 40)) return startDrag("events", mouseX, mouseY, EventTrackerState.x, EventTrackerState.y);
         if (inside(mouseX, mouseY, ItemCooldownHudState.x, ItemCooldownHudState.y, 100, 40)) return startDrag("itemCooldowns", mouseX, mouseY, ItemCooldownHudState.x, ItemCooldownHudState.y);
         if (inside(mouseX, mouseY, ArmorCooldownHudState.x, ArmorCooldownHudState.y, 100, 40)) return startDrag("armorCooldowns", mouseX, mouseY, ArmorCooldownHudState.x, ArmorCooldownHudState.y);
+        if (inside(mouseX, mouseY, AccessoryCooldownState.x, AccessoryCooldownState.y, 100, 40)) return startDrag("accessoryCooldowns", mouseX, mouseY, AccessoryCooldownState.x, AccessoryCooldownState.y);
 
         String lowTitlePreview = LowHealthWarning.lowHpTitle.isEmpty() ? "LOW HP" : LowHealthWarning.lowHpTitle;
         int lowTitleW = (int) (font.width(lowTitlePreview) * UtilityHudRenderer.WARNING_TITLE_SCALE);
@@ -163,6 +165,7 @@ public class HudEditorScreen extends Screen {
         if ("events".equals(dragging)) { EventTrackerState.x = x; EventTrackerState.y = y; }
         if ("itemCooldowns".equals(dragging)) { ItemCooldownHudState.x = x; ItemCooldownHudState.y = y; }
         if ("armorCooldowns".equals(dragging)) { ArmorCooldownHudState.x = x; ArmorCooldownHudState.y = y; }
+        if ("accessoryCooldowns".equals(dragging)) { AccessoryCooldownState.x = x; AccessoryCooldownState.y = y; }
         if ("lowTitle".equals(dragging)) { LowHealthWarning.lowTitleX = x; LowHealthWarning.lowTitleY = y; }
         if ("midTitle".equals(dragging)) { LowHealthWarning.midTitleX = x; LowHealthWarning.midTitleY = y; }
         if ("bossTitle".equals(dragging)) { BossTitleState.x = x; BossTitleState.y = y; }

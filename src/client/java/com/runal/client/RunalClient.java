@@ -270,6 +270,7 @@ public class RunalClient implements ClientModInitializer {
 		BossTitleController.register();
 		DiscordPresenceController.register();
 		ArmorCooldownController.register();
+		AccessoryCooldownController.register();
 
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			ModuleConfig.save();

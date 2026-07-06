@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class UtilityHudRenderer {
@@ -66,6 +67,10 @@ public class UtilityHudRenderer {
 
         if (ArmorCooldownHudState.enabled && !ArmorCooldownHudState.names.isEmpty()) {
             drawArmorCooldowns(graphics, mc);
+        }
+
+        if (AccessoryCooldownState.enabled && !AccessoryCooldownState.active.isEmpty()) {
+            drawAccessoryCooldowns(graphics, mc);
         }
 
         if (EventTrackerState.enabled && !EventTrackerState.events.isEmpty()) {
@@ -201,6 +206,29 @@ public class UtilityHudRenderer {
         int y = ArmorCooldownHudState.y + 5;
         for (int i = 0; i < names.size(); i++) {
             drawLine(graphics, mc, ArmorCooldownHudState.x + 6, y, names.get(i), percents.get(i) + "%", ArmorCooldownHudState.nameColor, ArmorCooldownHudState.valueColor);
+            y += 11;
+        }
+    }
+
+    private static void drawAccessoryCooldowns(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
+        List<String> names = new ArrayList<>();
+        List<Integer> percents = new ArrayList<>();
+        for (Map.Entry<String, AccessoryCooldownState.ActiveCooldown> entry : AccessoryCooldownState.active.entrySet()) {
+            AccessoryCooldownState.ActiveCooldown cooldown = entry.getValue();
+            names.add(entry.getKey());
+            percents.add(Math.round((cooldown.remainingSeconds / (float) cooldown.totalSeconds) * 100f));
+        }
+
+        int h = Math.max(16, names.size() * 11 + 8);
+        int w = 60;
+        for (int i = 0; i < names.size(); i++) {
+            w = Math.max(w, mc.font.width(names.get(i) + ": " + percents.get(i) + "%") + 12);
+        }
+
+        drawPanel(graphics, AccessoryCooldownState.x, AccessoryCooldownState.y, w, h, 0xAA101216);
+        int y = AccessoryCooldownState.y + 5;
+        for (int i = 0; i < names.size(); i++) {
+            drawLine(graphics, mc, AccessoryCooldownState.x + 6, y, names.get(i), percents.get(i) + "%", AccessoryCooldownState.nameColor, AccessoryCooldownState.valueColor);
             y += 11;
         }
     }
