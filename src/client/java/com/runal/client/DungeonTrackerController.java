@@ -22,7 +22,8 @@ public class DungeonTrackerController {
     private static final Map<String, String> DUNGEON_BOSS_NAMES = Map.of(
             "Forest Dungeon", "Spider Queen",
             "Divine Catacombs", "Great Paladin",
-            "Heart of the Divine", "Divine Guardian"
+            "Heart of the Divine", "Divine Guardian",
+            "Elemental Chamber", "Random Boss"
     );
 
     private static final Pattern ROOM_PATTERN = Pattern.compile("^(.+?)\\s*[-–—]\\s*Room (\\d+)$", Pattern.MULTILINE);

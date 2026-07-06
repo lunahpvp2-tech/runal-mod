@@ -9,13 +9,10 @@ import net.minecraft.network.chat.Style;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class AutoGGController {
 
-    private static final Pattern HAS_FOUND_PATTERN =
-            Pattern.compile("^([A-Za-z0-9_]{1,16}) has found (.+)!$", Pattern.MULTILINE);
+    private static final String FOUND_MARKER = "has found ";
 
     public static void register() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
@@ -40,27 +37,30 @@ public class AutoGGController {
         List<int[]> ranges = new ArrayList<>();
 
         message.visit((style, text) -> {
-            String cleaned = normalize(text);
             int start = sb.length();
-            sb.append(cleaned);
+            sb.append(text);
             ranges.add(new int[]{start, sb.length()});
-            runs.add(new StyledRun(cleaned, style));
+            runs.add(new StyledRun(text, style));
             return Optional.<Void>empty();
         }, Style.EMPTY);
 
-        String fullText = sb.toString();
-        Matcher matcher = HAS_FOUND_PATTERN.matcher(fullText);
-        if (!matcher.find()) return false;
+        String fullText = sb.toString().replaceAll("\\p{Zs}", " ");
 
-        // Some servers send legacy section-sign color codes embedded directly in the message
-        // text instead of real styled components, in which case the Style-based check below
-        // never sees a color at all. Check for that first since it's cheap and exact.
-        String itemSegment = fullText.substring(matcher.start(2), matcher.end(2));
+        // A guild-chat line always carries its "[G]" tag - reject those outright, whoever's
+        // typing could say "has found" themselves. Otherwise, this server marks its own genuine
+        // broadcasts with a "|" bar, so require both that and the actual find text.
+        if (fullText.contains("[G]")) return false;
+        if (!fullText.contains("|")) return false;
+
+        int foundIdx = fullText.indexOf(FOUND_MARKER);
+        if (foundIdx < 0) return false;
+        int itemStart = foundIdx + FOUND_MARKER.length();
+
+        String itemSegment = fullText.substring(itemStart);
         if (containsLegacyCode(itemSegment, '5')) return AutoGGState.INSTANCE.triggerEpic;
         if (containsLegacyCode(itemSegment, '6')) return AutoGGState.INSTANCE.triggerLegendary;
         if (containsLegacyCode(itemSegment, 'd')) return AutoGGState.INSTANCE.triggerMythical;
 
-        int itemStart = matcher.start(2);
         Style itemStyle = null;
         for (int i = 0; i < ranges.size(); i++) {
             int[] range = ranges.get(i);
@@ -87,11 +87,6 @@ public class AutoGGController {
                 && style.getColor() != null
                 && expected.getColor() != null
                 && style.getColor().getValue() == expected.getColor();
-    }
-
-    private static String normalize(String text) {
-        String cleaned = text.replaceAll("[\\p{So}\\p{Co}]", "");
-        return cleaned.replaceAll("\\p{Zs}", " ");
     }
 
     private record StyledRun(String text, Style style) {
