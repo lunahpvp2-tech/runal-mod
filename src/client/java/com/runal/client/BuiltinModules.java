@@ -279,6 +279,18 @@ public class BuiltinModules {
 
         ModuleManager.register(new Module() {
             private final List<ModuleSetting> settings = List.of(
+                    new ColorModuleSetting("Name Color", () -> DungeonTrackerState.nameColor, v -> DungeonTrackerState.nameColor = v),
+                    new ColorModuleSetting("Value Color", () -> DungeonTrackerState.valueColor, v -> DungeonTrackerState.valueColor = v)
+            );
+            public String getName() { return "Dungeon Tracker"; }
+            public String getCategory() { return "Tracking"; }
+            public boolean isEnabled() { return DungeonTrackerState.enabled; }
+            public void toggle() { DungeonTrackerState.enabled = !DungeonTrackerState.enabled; }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
                     new ToggleModuleSetting("Show HUD", () -> ArmorHudState.showHud, v -> ArmorHudState.showHud = v),
                     new EnumModuleSetting("Orientation", List.of("Horizontal", "Vertical"), () -> ArmorHudState.orientation, v -> ArmorHudState.orientation = v)
             );

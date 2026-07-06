@@ -5,8 +5,6 @@ import java.util.Map;
 
 public class AccessoryCooldownState {
     public static boolean enabled = true;
-    public static int x = 8;
-    public static int y = 250;
     public static int nameColor = 0xFF9C6BFF;
     public static int valueColor = 0xFFFFFFFF;
 

@@ -61,17 +61,7 @@ public class UtilityHudRenderer {
             drawArmor(graphics, mc);
         }
 
-        if (ItemCooldownHudState.enabled && mc.player != null) {
-            drawItemCooldowns(graphics, mc);
-        }
-
-        if (ArmorCooldownHudState.enabled && !ArmorCooldownHudState.names.isEmpty()) {
-            drawArmorCooldowns(graphics, mc);
-        }
-
-        if (AccessoryCooldownState.enabled && !AccessoryCooldownState.active.isEmpty()) {
-            drawAccessoryCooldowns(graphics, mc);
-        }
+        drawCooldowns(graphics, mc);
 
         if (EventTrackerState.enabled && !EventTrackerState.events.isEmpty()) {
             int lines = EventTrackerState.events.size();
@@ -88,6 +78,10 @@ public class UtilityHudRenderer {
                 drawLine(graphics, mc, EventTrackerState.x + 6, y, event.name, value, EventTrackerState.nameColor, EventTrackerState.valueColor);
                 y += 11;
             }
+        }
+
+        if (DungeonTrackerState.enabled && DungeonTrackerState.dungeonName != null) {
+            drawDungeonTracker(graphics, mc);
         }
 
         String activeTitleKind = LowHealthWarning.getActiveTitleKind();
@@ -156,81 +150,84 @@ public class UtilityHudRenderer {
         graphics.outline(x, y, w, h, 0x5535D77A);
     }
 
-    private static void drawItemCooldowns(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
-        List<String> names = new ArrayList<>();
-        List<Integer> percents = new ArrayList<>();
-        Set<String> seenNames = new HashSet<>();
+    private record CooldownEntry(String name, int percent, int nameColor, int valueColor) {
+    }
 
-        for (int slotId = InventoryMenu.INV_SLOT_START; slotId < InventoryMenu.USE_ROW_SLOT_END; slotId++) {
-            Slot slot = mc.player.containerMenu.getSlot(slotId);
-            if (!slot.hasItem()) continue;
+    private static void drawCooldowns(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
+        List<CooldownEntry> entries = new ArrayList<>();
 
-            ItemStack stack = slot.getItem();
-            if (!mc.player.getCooldowns().isOnCooldown(stack)) continue;
+        if (ItemCooldownHudState.enabled && mc.player != null) {
+            Set<String> seenNames = new HashSet<>();
+            for (int slotId = InventoryMenu.INV_SLOT_START; slotId < InventoryMenu.USE_ROW_SLOT_END; slotId++) {
+                Slot slot = mc.player.containerMenu.getSlot(slotId);
+                if (!slot.hasItem()) continue;
 
-            String name = stack.getHoverName().getString();
-            if (!seenNames.add(name)) continue;
+                ItemStack stack = slot.getItem();
+                if (!mc.player.getCooldowns().isOnCooldown(stack)) continue;
 
-            float percent = mc.player.getCooldowns().getCooldownPercent(stack, 1.0f);
-            names.add(name);
-            percents.add(Math.round(percent * 100f));
+                String name = stack.getHoverName().getString();
+                if (!seenNames.add(name)) continue;
+
+                float percent = mc.player.getCooldowns().getCooldownPercent(stack, 1.0f);
+                entries.add(new CooldownEntry(name, Math.round(percent * 100f), ItemCooldownHudState.nameColor, ItemCooldownHudState.valueColor));
+            }
         }
 
-        if (names.isEmpty()) return;
+        if (ArmorCooldownHudState.enabled) {
+            for (int i = 0; i < ArmorCooldownHudState.names.size(); i++) {
+                entries.add(new CooldownEntry(ArmorCooldownHudState.names.get(i), ArmorCooldownHudState.percents.get(i), ArmorCooldownHudState.nameColor, ArmorCooldownHudState.valueColor));
+            }
+        }
 
-        int h = Math.max(16, names.size() * 11 + 8);
+        if (AccessoryCooldownState.enabled) {
+            for (Map.Entry<String, AccessoryCooldownState.ActiveCooldown> entry : AccessoryCooldownState.active.entrySet()) {
+                AccessoryCooldownState.ActiveCooldown cooldown = entry.getValue();
+                int percent = Math.round((cooldown.remainingSeconds / (float) cooldown.totalSeconds) * 100f);
+                entries.add(new CooldownEntry(entry.getKey(), percent, AccessoryCooldownState.nameColor, AccessoryCooldownState.valueColor));
+            }
+        }
+
+        if (entries.isEmpty()) return;
+
+        int h = Math.max(16, entries.size() * 11 + 8);
         int w = 60;
-        for (int i = 0; i < names.size(); i++) {
-            w = Math.max(w, mc.font.width(names.get(i) + ": " + percents.get(i) + "%") + 12);
+        for (CooldownEntry entry : entries) {
+            w = Math.max(w, mc.font.width(entry.name() + ": " + entry.percent() + "%") + 12);
         }
 
         drawPanel(graphics, ItemCooldownHudState.x, ItemCooldownHudState.y, w, h, 0xAA101216);
         int y = ItemCooldownHudState.y + 5;
-        for (int i = 0; i < names.size(); i++) {
-            drawLine(graphics, mc, ItemCooldownHudState.x + 6, y, names.get(i), percents.get(i) + "%", ItemCooldownHudState.nameColor, ItemCooldownHudState.valueColor);
+        for (CooldownEntry entry : entries) {
+            drawLine(graphics, mc, ItemCooldownHudState.x + 6, y, entry.name(), entry.percent() + "%", entry.nameColor(), entry.valueColor());
             y += 11;
         }
     }
 
-    private static void drawArmorCooldowns(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
-        List<String> names = ArmorCooldownHudState.names;
-        List<Integer> percents = ArmorCooldownHudState.percents;
+    private static void drawDungeonTracker(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
+        int roomsUntilParkour = DungeonTrackerController.roomsUntil("Parkour");
+        int roomsUntilBoss = DungeonTrackerController.roomsUntil("Boss");
+        int roomsUntilTreasure = DungeonTrackerController.roomsUntil("Treasure");
 
-        int h = Math.max(16, names.size() * 11 + 8);
+        String roomStr = String.valueOf(DungeonTrackerState.currentRoom);
+        String parkourStr = roomsUntilParkour == 0 ? "Now" : roomsUntilParkour + " rooms";
+        String bossStr = roomsUntilBoss == 0 ? "Now" : roomsUntilBoss + " rooms";
+        String chestStr = roomsUntilTreasure == 0 ? "Now" : roomsUntilTreasure + " rooms";
+
         int w = 60;
-        for (int i = 0; i < names.size(); i++) {
-            w = Math.max(w, mc.font.width(names.get(i) + ": " + percents.get(i) + "%") + 12);
-        }
+        w = Math.max(w, mc.font.width("Dungeon: " + DungeonTrackerState.dungeonName) + 12);
+        w = Math.max(w, mc.font.width("Room: " + roomStr) + 12);
+        w = Math.max(w, mc.font.width("Parkour: " + parkourStr) + 12);
+        w = Math.max(w, mc.font.width("Boss: " + bossStr) + 12);
+        w = Math.max(w, mc.font.width("Chest: " + chestStr) + 12);
+        int h = Math.max(16, 5 * 11 + 8);
 
-        drawPanel(graphics, ArmorCooldownHudState.x, ArmorCooldownHudState.y, w, h, 0xAA101216);
-        int y = ArmorCooldownHudState.y + 5;
-        for (int i = 0; i < names.size(); i++) {
-            drawLine(graphics, mc, ArmorCooldownHudState.x + 6, y, names.get(i), percents.get(i) + "%", ArmorCooldownHudState.nameColor, ArmorCooldownHudState.valueColor);
-            y += 11;
-        }
-    }
-
-    private static void drawAccessoryCooldowns(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
-        List<String> names = new ArrayList<>();
-        List<Integer> percents = new ArrayList<>();
-        for (Map.Entry<String, AccessoryCooldownState.ActiveCooldown> entry : AccessoryCooldownState.active.entrySet()) {
-            AccessoryCooldownState.ActiveCooldown cooldown = entry.getValue();
-            names.add(entry.getKey());
-            percents.add(Math.round((cooldown.remainingSeconds / (float) cooldown.totalSeconds) * 100f));
-        }
-
-        int h = Math.max(16, names.size() * 11 + 8);
-        int w = 60;
-        for (int i = 0; i < names.size(); i++) {
-            w = Math.max(w, mc.font.width(names.get(i) + ": " + percents.get(i) + "%") + 12);
-        }
-
-        drawPanel(graphics, AccessoryCooldownState.x, AccessoryCooldownState.y, w, h, 0xAA101216);
-        int y = AccessoryCooldownState.y + 5;
-        for (int i = 0; i < names.size(); i++) {
-            drawLine(graphics, mc, AccessoryCooldownState.x + 6, y, names.get(i), percents.get(i) + "%", AccessoryCooldownState.nameColor, AccessoryCooldownState.valueColor);
-            y += 11;
-        }
+        drawPanel(graphics, DungeonTrackerState.x, DungeonTrackerState.y, w, h, 0xAA101216);
+        int y = DungeonTrackerState.y + 5;
+        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Dungeon", DungeonTrackerState.dungeonName, DungeonTrackerState.nameColor, DungeonTrackerState.valueColor); y += 11;
+        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Room", roomStr, DungeonTrackerState.nameColor, DungeonTrackerState.valueColor); y += 11;
+        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Parkour", parkourStr, DungeonTrackerState.nameColor, DungeonTrackerState.valueColor); y += 11;
+        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Boss", bossStr, DungeonTrackerState.nameColor, DungeonTrackerState.valueColor); y += 11;
+        drawLine(graphics, mc, DungeonTrackerState.x + 6, y, "Chest", chestStr, DungeonTrackerState.nameColor, DungeonTrackerState.valueColor);
     }
 
     private static void drawArmor(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
