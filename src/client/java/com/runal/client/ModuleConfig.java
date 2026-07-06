@@ -61,6 +61,8 @@ public class ModuleConfig {
         props.setProperty("hud.mid_hp_title.y", String.valueOf(LowHealthWarning.midTitleY));
         props.setProperty("hud.boss_title.x", String.valueOf(BossTitleState.x));
         props.setProperty("hud.boss_title.y", String.valueOf(BossTitleState.y));
+        props.setProperty("hud.boss_defeats.x", String.valueOf(BossDefeatState.x));
+        props.setProperty("hud.boss_defeats.y", String.valueOf(BossDefeatState.y));
     }
 
     private static void loadHudPositions(Properties props) {
@@ -82,6 +84,8 @@ public class ModuleConfig {
         LowHealthWarning.midTitleY = getInt(props, "hud.mid_hp_title.y", LowHealthWarning.midTitleY);
         BossTitleState.x = getInt(props, "hud.boss_title.x", BossTitleState.x);
         BossTitleState.y = getInt(props, "hud.boss_title.y", BossTitleState.y);
+        BossDefeatState.x = getInt(props, "hud.boss_defeats.x", BossDefeatState.x);
+        BossDefeatState.y = getInt(props, "hud.boss_defeats.y", BossDefeatState.y);
     }
 
     private static int getInt(Properties props, String key, int fallback) {

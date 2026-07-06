@@ -291,6 +291,18 @@ public class BuiltinModules {
 
         ModuleManager.register(new Module() {
             private final List<ModuleSetting> settings = List.of(
+                    new ColorModuleSetting("Name Color", () -> BossDefeatState.nameColor, v -> BossDefeatState.nameColor = v),
+                    new ColorModuleSetting("Value Color", () -> BossDefeatState.valueColor, v -> BossDefeatState.valueColor = v)
+            );
+            public String getName() { return "Boss Defeat Counter"; }
+            public String getCategory() { return "Tracking"; }
+            public boolean isEnabled() { return BossDefeatState.enabled; }
+            public void toggle() { BossDefeatState.enabled = !BossDefeatState.enabled; }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
                     new ToggleModuleSetting("Show HUD", () -> ArmorHudState.showHud, v -> ArmorHudState.showHud = v),
                     new EnumModuleSetting("Orientation", List.of("Horizontal", "Vertical"), () -> ArmorHudState.orientation, v -> ArmorHudState.orientation = v)
             );

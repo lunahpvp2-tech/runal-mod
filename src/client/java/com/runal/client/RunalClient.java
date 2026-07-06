@@ -256,6 +256,7 @@ public class RunalClient implements ClientModInitializer {
 		ModuleConfig.load();
 		TeamTrackerState.INSTANCE.load();
 		WaypointManagerState.INSTANCE.load();
+		BossDefeatState.load();
 
 		LowHealthWarning.register();
 		HealthBarRenderer.register();
@@ -272,6 +273,7 @@ public class RunalClient implements ClientModInitializer {
 		ArmorCooldownController.register();
 		AccessoryCooldownController.register();
 		DungeonTrackerController.register();
+		BossDefeatController.register();
 
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			ModuleConfig.save();

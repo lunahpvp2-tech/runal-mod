@@ -16,7 +16,6 @@ public class DiscordPresenceController {
     private static final String RUNAL_DISCORD = "https://discord.gg/G9JrtKjQdh";
     private static final long RECONNECT_INTERVAL_MS = 15_000L;
     private static final long MIN_UPDATE_INTERVAL_MS = 15_000L;
-    private static final long BOSS_FIGHT_HOLD_MS = 60_000L;
 
     private static final DiscordIpcClient client = new DiscordIpcClient();
     private static final AtomicBoolean running = new AtomicBoolean(true);
@@ -49,9 +48,7 @@ public class DiscordPresenceController {
     private static void updatePendingText() {
         pendingDetails = "Exploring the World";
 
-        boolean fightingBoss = BossTitleState.lastBossName != null
-                && System.currentTimeMillis() - BossTitleState.lastBossMessageMs < BOSS_FIGHT_HOLD_MS;
-        if (fightingBoss) {
+        if (BossTitleState.isFightingBoss()) {
             pendingState = "Fighting " + BossTitleState.lastBossName + " in Scepter";
             return;
         }

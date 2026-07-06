@@ -13,9 +13,14 @@ public class BossTitleState {
 
     public static String lastBossName;
     public static long lastBossMessageMs;
+    public static final long FIGHT_HOLD_MS = 60_000L;
 
     public static void ensureDefaultPosition(int screenWidth, int screenHeight) {
         if (x == Integer.MIN_VALUE) x = screenWidth / 2;
         if (y == Integer.MIN_VALUE) y = screenHeight / 2;
+    }
+
+    public static boolean isFightingBoss() {
+        return lastBossName != null && System.currentTimeMillis() - lastBossMessageMs < FIGHT_HOLD_MS;
     }
 }

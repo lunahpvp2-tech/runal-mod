@@ -45,6 +45,7 @@ public class HudEditorScreen extends Screen {
         drawWidget(context, "Events", EventTrackerState.x, EventTrackerState.y, 100, 40, 0xAA101216);
         drawWidget(context, "Cooldowns", ItemCooldownHudState.x, ItemCooldownHudState.y, 100, 40, 0xAA101216);
         drawWidget(context, "Dungeon Tracker", DungeonTrackerState.x, DungeonTrackerState.y, 100, 62, 0xAA101216);
+        drawWidget(context, "Boss Defeats", BossDefeatState.x, BossDefeatState.y, 100, 16, 0xAA101216);
 
         String lowTitlePreview = LowHealthWarning.lowHpTitle.isEmpty() ? "LOW HP" : LowHealthWarning.lowHpTitle;
         int lowTitleW = (int) (font.width(lowTitlePreview) * UtilityHudRenderer.WARNING_TITLE_SCALE);
@@ -108,6 +109,7 @@ public class HudEditorScreen extends Screen {
         if (inside(mouseX, mouseY, EventTrackerState.x, EventTrackerState.y, 100, 40)) return startDrag("events", mouseX, mouseY, EventTrackerState.x, EventTrackerState.y);
         if (inside(mouseX, mouseY, ItemCooldownHudState.x, ItemCooldownHudState.y, 100, 40)) return startDrag("itemCooldowns", mouseX, mouseY, ItemCooldownHudState.x, ItemCooldownHudState.y);
         if (inside(mouseX, mouseY, DungeonTrackerState.x, DungeonTrackerState.y, 100, 62)) return startDrag("dungeonTracker", mouseX, mouseY, DungeonTrackerState.x, DungeonTrackerState.y);
+        if (inside(mouseX, mouseY, BossDefeatState.x, BossDefeatState.y, 100, 16)) return startDrag("bossDefeats", mouseX, mouseY, BossDefeatState.x, BossDefeatState.y);
 
         String lowTitlePreview = LowHealthWarning.lowHpTitle.isEmpty() ? "LOW HP" : LowHealthWarning.lowHpTitle;
         int lowTitleW = (int) (font.width(lowTitlePreview) * UtilityHudRenderer.WARNING_TITLE_SCALE);
@@ -166,6 +168,7 @@ public class HudEditorScreen extends Screen {
         if ("lowTitle".equals(dragging)) { LowHealthWarning.lowTitleX = x; LowHealthWarning.lowTitleY = y; }
         if ("midTitle".equals(dragging)) { LowHealthWarning.midTitleX = x; LowHealthWarning.midTitleY = y; }
         if ("bossTitle".equals(dragging)) { BossTitleState.x = x; BossTitleState.y = y; }
+        if ("bossDefeats".equals(dragging)) { BossDefeatState.x = x; BossDefeatState.y = y; }
         ModuleConfig.save();
         return true;
     }

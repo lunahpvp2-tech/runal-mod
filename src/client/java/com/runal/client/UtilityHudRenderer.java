@@ -95,6 +95,10 @@ public class UtilityHudRenderer {
             BossTitleState.ensureDefaultPosition(mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
             drawBossTitle(graphics, mc);
         }
+
+        if (BossDefeatState.enabled && BossTitleState.isFightingBoss()) {
+            drawBossDefeatCounter(graphics, mc);
+        }
     }
 
     public static final float WARNING_TITLE_SCALE = 2.5f;
@@ -133,6 +137,17 @@ public class UtilityHudRenderer {
         *///?} else {
         graphics.pose().popMatrix();
         //?}
+    }
+
+    private static void drawBossDefeatCounter(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
+        String bossName = BossTitleState.lastBossName;
+        String value = String.valueOf(BossDefeatState.getCount(bossName));
+
+        int w = Math.max(60, mc.font.width(bossName + ": " + value) + 12);
+        int h = 16;
+
+        drawPanel(graphics, BossDefeatState.x, BossDefeatState.y, w, h, 0xAA101216);
+        drawLine(graphics, mc, BossDefeatState.x + 6, BossDefeatState.y + 5, bossName, value, BossDefeatState.nameColor, BossDefeatState.valueColor);
     }
 
     private static int countPerformanceLines() {
