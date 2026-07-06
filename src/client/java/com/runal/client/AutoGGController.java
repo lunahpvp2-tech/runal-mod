@@ -56,36 +56,40 @@ public class AutoGGController {
         if (foundIdx < 0) return false;
         int itemStart = foundIdx + FOUND_MARKER.length();
 
+        boolean matchesRarity = false;
         String itemSegment = fullText.substring(itemStart);
-        // &6 (gold) = legendary, &5 (dark purple) = epic, &d (light purple) = mythical.
-        if (containsLegacyCode(itemSegment, '6')) return AutoGGState.INSTANCE.triggerLegendary;
-        if (containsLegacyCode(itemSegment, '5')) return AutoGGState.INSTANCE.triggerEpic;
-        if (containsLegacyCode(itemSegment, 'd')) return AutoGGState.INSTANCE.triggerMythical;
-
-        Style itemStyle = null;
-        for (int i = 0; i < ranges.size(); i++) {
-            int[] range = ranges.get(i);
-            if (itemStart >= range[0] && itemStart < range[1]) {
-                itemStyle = runs.get(i).style;
-                break;
+        // &6 (gold) = legendary, &5 (dark purple) = epic, &d (light purple) = mythical. Bold is
+        // not required - the server sends the same find both bolded and plain, and only one of
+        // those two copies needs to match for this to count.
+        if (containsLegacyCode(itemSegment, '6')) matchesRarity = AutoGGState.INSTANCE.triggerLegendary;
+        else if (containsLegacyCode(itemSegment, '5')) matchesRarity = AutoGGState.INSTANCE.triggerEpic;
+        else if (containsLegacyCode(itemSegment, 'd')) matchesRarity = AutoGGState.INSTANCE.triggerMythical;
+        else {
+            Style itemStyle = null;
+            for (int i = 0; i < ranges.size(); i++) {
+                int[] range = ranges.get(i);
+                if (itemStart >= range[0] && itemStart < range[1]) {
+                    itemStyle = runs.get(i).style;
+                    break;
+                }
+            }
+            if (itemStyle != null) {
+                if (isRarity(itemStyle, ChatFormatting.GOLD)) matchesRarity = AutoGGState.INSTANCE.triggerLegendary;
+                else if (isRarity(itemStyle, ChatFormatting.DARK_PURPLE)) matchesRarity = AutoGGState.INSTANCE.triggerEpic;
+                else if (isRarity(itemStyle, ChatFormatting.LIGHT_PURPLE)) matchesRarity = AutoGGState.INSTANCE.triggerMythical;
             }
         }
-        if (itemStyle == null) return false;
 
-        if (isRarity(itemStyle, ChatFormatting.GOLD)) return AutoGGState.INSTANCE.triggerLegendary;
-        if (isRarity(itemStyle, ChatFormatting.DARK_PURPLE)) return AutoGGState.INSTANCE.triggerEpic;
-        if (isRarity(itemStyle, ChatFormatting.LIGHT_PURPLE)) return AutoGGState.INSTANCE.triggerMythical;
-        return false;
+        return matchesRarity;
     }
 
     private static boolean containsLegacyCode(String text, char colorCode) {
         String lower = text.toLowerCase();
-        return lower.contains("§" + colorCode) && lower.contains("§l");
+        return lower.contains("§" + colorCode);
     }
 
     private static boolean isRarity(Style style, ChatFormatting expected) {
-        return style.isBold()
-                && style.getColor() != null
+        return style.getColor() != null
                 && expected.getColor() != null
                 && style.getColor().getValue() == expected.getColor();
     }
