@@ -111,6 +111,17 @@ public class BuiltinModules {
 
         ModuleManager.register(new Module() {
             private final List<ModuleSetting> settings = List.of(
+                    new TextModuleSetting("Response", () -> AutoGGAchievementState.INSTANCE.response, v -> AutoGGAchievementState.INSTANCE.response = v)
+            );
+            public String getName() { return "Auto GG (Achievements)"; }
+            public String getCategory() { return "Misc"; }
+            public boolean isEnabled() { return AutoGGAchievementState.INSTANCE.isEnabled(); }
+            public void toggle() { AutoGGAchievementState.INSTANCE.toggle(); }
+            public List<ModuleSetting> getSettings() { return settings; }
+        });
+
+        ModuleManager.register(new Module() {
+            private final List<ModuleSetting> settings = List.of(
                     new ToggleModuleSetting("Trash Common", () -> AutoTrashState.INSTANCE.trashCommon, v -> AutoTrashState.INSTANCE.trashCommon = v),
                     new ToggleModuleSetting("Trash Uncommon", () -> AutoTrashState.INSTANCE.trashUncommon, v -> AutoTrashState.INSTANCE.trashUncommon = v),
                     new ToggleModuleSetting("Trash Rare", () -> AutoTrashState.INSTANCE.trashRare, v -> AutoTrashState.INSTANCE.trashRare = v),
