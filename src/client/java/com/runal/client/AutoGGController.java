@@ -13,6 +13,7 @@ import java.util.Optional;
 public class AutoGGController {
 
     private static final String FOUND_MARKER = "has found ";
+    private static final String ACHIEVEMENT_MARKER = "has completed the achievement ";
 
     public static void register() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
@@ -51,6 +52,9 @@ public class AutoGGController {
         // broadcasts with a "|" bar, so require both that and the actual find text.
         if (fullText.contains("[G]")) return false;
         if (!fullText.contains("|")) return false;
+
+        // Achievement completions have no rarity to filter on - any genuine broadcast counts.
+        if (fullText.contains(ACHIEVEMENT_MARKER)) return true;
 
         int foundIdx = fullText.indexOf(FOUND_MARKER);
         if (foundIdx < 0) return false;
