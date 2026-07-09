@@ -27,6 +27,7 @@ public class BossTitleController {
             "Harbinger of Storms",
             "Ruinwing",
             "Aeralith",
+            "Elemental Sheep",
     };
 
     private static final int MAX_WORDS = 5;
