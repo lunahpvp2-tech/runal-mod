@@ -20,6 +20,11 @@ public class DiscordPresenceController {
     private static final String RUNAL_DISCORD = "https://discord.gg/G9JrtKjQdh";
     private static final long RECONNECT_INTERVAL_MS = 15_000L;
     private static final long MIN_UPDATE_INTERVAL_MS = 15_000L;
+    private static final int MINING_CONFIRM_TICKS = 10;
+    private static final long MINING_HOLD_MS = 2_000L;
+
+    private static int miningStreakTicks = 0;
+    private static long lastConfirmedMiningMs = 0;
 
     private static final DiscordIpcClient client = new DiscordIpcClient();
     private static final AtomicBoolean running = new AtomicBoolean(true);
@@ -82,8 +87,20 @@ public class DiscordPresenceController {
 
     private static boolean isMining() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.hitResult == null) return false;
-        return mc.options.keyAttack.isDown() && mc.hitResult.getType() == HitResult.Type.BLOCK;
+        boolean punchingBlock = mc.player != null && mc.hitResult != null
+                && mc.options.keyAttack.isDown() && mc.hitResult.getType() == HitResult.Type.BLOCK;
+
+        // Require a bit of sustained punching before this counts - a single accidental left-click
+        // on a block shouldn't flip the status, especially since Discord updates are throttled and
+        // a one-tick blip could otherwise get stuck showing "Mining" for up to MIN_UPDATE_INTERVAL_MS.
+        if (punchingBlock) {
+            miningStreakTicks++;
+            if (miningStreakTicks >= MINING_CONFIRM_TICKS) lastConfirmedMiningMs = System.currentTimeMillis();
+        } else {
+            miningStreakTicks = 0;
+        }
+
+        return System.currentTimeMillis() - lastConfirmedMiningMs < MINING_HOLD_MS;
     }
 
     private static boolean isFishing() {
