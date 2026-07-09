@@ -4,6 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.phys.HitResult;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -53,12 +57,42 @@ public class DiscordPresenceController {
             return;
         }
 
+        if (DungeonTrackerState.dungeonName != null) {
+            pendingState = "Inside " + DungeonTrackerState.dungeonName + " Dungeon";
+            return;
+        }
+
+        if (isFishing()) {
+            pendingState = "Fishing in the Oasis";
+            return;
+        }
+
+        if (isMining()) {
+            pendingState = "Mining in the Caverns";
+            return;
+        }
+
         if (!EventTrackerState.events.isEmpty()) {
             pendingState = EventTrackerState.events.values().iterator().next().name;
             return;
         }
 
         pendingState = null;
+    }
+
+    private static boolean isMining() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.hitResult == null) return false;
+        return mc.options.keyAttack.isDown() && mc.hitResult.getType() == HitResult.Type.BLOCK;
+    }
+
+    private static boolean isFishing() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.level == null) return false;
+        for (Entity entity : mc.level.entitiesForRendering()) {
+            if (entity instanceof FishingHook hook && hook.getPlayerOwner() == mc.player) return true;
+        }
+        return false;
     }
 
     private static void ipcLoop() {
