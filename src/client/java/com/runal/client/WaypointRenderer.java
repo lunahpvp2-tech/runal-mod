@@ -13,7 +13,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 *///?}
-//? if 26.1.2 {
+//? if 26.1.2 || 26.2 {
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
@@ -23,8 +23,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//? if 1.21.4 || 1.21.11 || 26.1.2 {
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ShapeRenderer;
+//?}
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -50,7 +52,7 @@ public class WaypointRenderer {
         /*WorldRenderEvents.END_MAIN.register(WaypointRenderer::renderBeams);
         HudRenderCallback.EVENT.register(WaypointRenderer::renderLabels);
         *///?}
-        //? if 26.1.2 {
+        //? if 26.1.2 || 26.2 {
         LevelRenderEvents.AFTER_TRANSLUCENT_TERRAIN.register(WaypointRenderer::renderBeams);
         HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("runal", "waypoint_labels"), WaypointRenderer::renderLabels);
         //?}
@@ -59,7 +61,7 @@ public class WaypointRenderer {
     //? if 1.21.4 || 1.21.11 {
     /*private static void renderBeams(WorldRenderContext context) {
     *///?}
-    //? if 26.1.2 {
+    //? if 26.1.2 || 26.2 {
     private static void renderBeams(LevelRenderContext context) {
     //?}
         if (!WaypointManagerState.INSTANCE.isEnabled()) return;
@@ -83,6 +85,9 @@ public class WaypointRenderer {
         PoseStack poseStack = context.poseStack();
         MultiBufferSource.BufferSource bufferSource = context.bufferSource();
         //?}
+        //? if 26.2 {
+        /*PoseStack poseStack = context.poseStack();
+        *///?}
         boolean renderedLines = false;
 
         for (Waypoint waypoint : WaypointManagerState.INSTANCE.getWaypoints()) {
@@ -107,6 +112,9 @@ public class WaypointRenderer {
             //? if 1.21.11 || 26.1.2 {
             ShapeRenderer.renderShape(poseStack, bufferSource.getBuffer(RenderTypes.lines()), Shapes.create(beam), 0, 0, 0, waypoint.color(), BEAM_LINE_WIDTH);
             //?}
+            //? if 26.2 {
+            /*context.submitNodeCollector().submitShapeOutline(poseStack, Shapes.create(beam), RenderTypes.LINES, waypoint.color(), BEAM_LINE_WIDTH, false);
+            *///?}
             poseStack.popPose();
             renderedLines = true;
         }

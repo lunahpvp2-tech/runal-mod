@@ -11,7 +11,16 @@ val requiredJava: JavaVersion = JavaVersion.toVersion(sc.properties.get<String>(
 
 val is1214 = sc.current.version == "1.21.4" || sc.current.version == "1.21.11"
 val only1214 = sc.current.version == "1.21.4"
+val only262 = sc.current.version == "26.2"
 sc.replacements {
+    regex {
+        direction.set(only262)
+        replace("""\.setScreen\(""", ".setScreenAndShow(", """\.setScreenAndShow\(""", ".setScreen(")
+    }
+    regex {
+        direction.set(only262)
+        replace("""\.getMainCamera\(\)""", ".mainCamera()", """\.mainCamera\(\)""", ".getMainCamera()")
+    }
     string {
         direction.set(only1214)
         replace("Identifier", "ResourceLocation")

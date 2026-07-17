@@ -9,13 +9,15 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 /*import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 *///?}
-//? if 26.1.2 {
+//? if 26.1.2 || 26.2 {
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 //?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+//? if 1.21.4 || 1.21.11 || 26.1.2 {
 import net.minecraft.client.renderer.MultiBufferSource;
+//?}
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -29,7 +31,7 @@ public class TeamTrackerRenderer {
         //? if 1.21.11 {
         /*WorldRenderEvents.END_MAIN.register(TeamTrackerRenderer::render);
         *///?}
-        //? if 26.1.2 {
+        //? if 26.1.2 || 26.2 {
         LevelRenderEvents.AFTER_TRANSLUCENT_TERRAIN.register(TeamTrackerRenderer::render);
         //?}
     }
@@ -37,7 +39,7 @@ public class TeamTrackerRenderer {
     //? if 1.21.4 || 1.21.11 {
     /*private static void render(WorldRenderContext context) {
     *///?}
-    //? if 26.1.2 {
+    //? if 26.1.2 || 26.2 {
     private static void render(LevelRenderContext context) {
     //?}
         if (!TeamTrackerState.INSTANCE.isEnabled()) return;
@@ -59,6 +61,9 @@ public class TeamTrackerRenderer {
         PoseStack poseStack = context.poseStack();
         MultiBufferSource.BufferSource bufferSource = context.bufferSource();
         //?}
+        //? if 26.2 {
+        /*PoseStack poseStack = context.poseStack();
+        *///?}
         Font font = mc.font;
         boolean rendered = false;
 
@@ -74,17 +79,26 @@ public class TeamTrackerRenderer {
 
             poseStack.pushPose();
             poseStack.translate(x, y, z);
+            //? if 1.21.4 || 1.21.11 || 26.1.2 {
             poseStack.mulPose(context.gameRenderer().getMainCamera().rotation());
             poseStack.scale(-0.025f, -0.025f, 0.025f);
 
             int textWidth = font.width(name);
             font.drawInBatch(name, -textWidth / 2f, 0, TeamTrackerState.INSTANCE.getTeammateColor(player.getUUID()), false,
                     poseStack.last().pose(), bufferSource, Font.DisplayMode.SEE_THROUGH, 0, 0xF000F0);
+            //?}
+            //? if 26.2 {
+            /*context.submitNodeCollector().submitNameTag(poseStack, Vec3.ZERO, 0,
+                    Message.colored(name, TeamTrackerState.INSTANCE.getTeammateColor(player.getUUID())), true, 0xF000F0,
+                    context.levelState().cameraRenderState);
+            *///?}
 
             poseStack.popPose();
             rendered = true;
         }
 
+        //? if 1.21.4 || 1.21.11 || 26.1.2 {
         if (rendered) bufferSource.endBatch();
+        //?}
     }
 }

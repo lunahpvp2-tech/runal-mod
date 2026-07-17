@@ -20,7 +20,7 @@ public abstract class LocalPlayerMixin {
         return original || com.runal.AutoSprintState.INSTANCE.isEnabled();
     }
     *///?}
-    //? if 1.21.11 || 26.1.2 {
+    //? if 1.21.11 || 26.1.2 || 26.2 {
     @ModifyExpressionValue(
             method = "aiStep",
             at = @At(

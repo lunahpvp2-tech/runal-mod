@@ -5,6 +5,9 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+//? if 26.2 {
+/*import net.minecraft.network.chat.TextColor;
+*///?}
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,9 +96,17 @@ public class AutoGGController {
     }
 
     private static boolean isRarity(Style style, ChatFormatting expected) {
+        //? if 1.21.4 || 1.21.11 || 26.1.2 {
         return style.getColor() != null
                 && expected.getColor() != null
                 && style.getColor().getValue() == expected.getColor();
+        //?}
+        //? if 26.2 {
+        /*TextColor expectedColor = TextColor.fromLegacyFormat(expected);
+        return style.getColor() != null
+                && expectedColor != null
+                && style.getColor().getValue() == expectedColor.getValue();
+        *///?}
     }
 
     private record StyledRun(String text, Style style) {

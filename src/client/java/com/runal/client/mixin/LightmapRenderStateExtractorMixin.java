@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 *///?}
-//? if 26.1.2 {
+//? if 26.1.2 || 26.2 {
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.renderer.LightmapRenderStateExtractor;
 import org.joml.Vector3f;
@@ -44,7 +44,7 @@ abstract class LightmapRenderStateExtractorMixin {
     }
 }
 *///?}
-//? if 26.1.2 {
+//? if 26.1.2 || 26.2 {
 @Mixin(LightmapRenderStateExtractor.class)
 abstract class LightmapRenderStateExtractorMixin {
 
