@@ -5,6 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ArmorCooldownController {
     private static final int SCAN_INTERVAL_TICKS = 6;
     private static final EquipmentSlot[] SLOTS =
@@ -25,14 +28,26 @@ public class ArmorCooldownController {
 
         ArmorCooldownHudState.names.clear();
         ArmorCooldownHudState.percents.clear();
+        ArmorCooldownHudState.secondsRemaining.clear();
+
+        long nowTick = mc.player.tickCount;
+        Set<String> activeKeys = new HashSet<>();
 
         for (EquipmentSlot slot : SLOTS) {
             ItemStack stack = mc.player.getItemBySlot(slot);
             if (stack.isEmpty() || !mc.player.getCooldowns().isOnCooldown(stack)) continue;
 
             float percent = mc.player.getCooldowns().getCooldownPercent(stack, 1.0f);
-            ArmorCooldownHudState.names.add(stack.getHoverName().getString());
+            String name = stack.getHoverName().getString();
+            String key = "armor:" + name;
+            activeKeys.add(key);
+
+            Integer remainingTicks = CooldownDurationEstimator.estimateRemainingTicks(key, percent, nowTick);
+            ArmorCooldownHudState.names.add(name);
             ArmorCooldownHudState.percents.add(Math.round(percent * 100f));
+            ArmorCooldownHudState.secondsRemaining.add(remainingTicks != null ? (remainingTicks + 19) / 20 : null);
         }
+
+        CooldownDurationEstimator.pruneExcept("armor:", activeKeys);
     }
 }

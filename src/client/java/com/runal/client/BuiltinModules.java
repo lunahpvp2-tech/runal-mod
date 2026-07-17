@@ -318,6 +318,7 @@ public class BuiltinModules {
                     new ToggleModuleSetting("Chat Notifications", () -> RunalSettings.chatNotifications, v -> RunalSettings.chatNotifications = v),
                     new ColorModuleSetting("Accent Color", () -> RunalSettings.accentColor, v -> RunalSettings.accentColor = v),
                     new ToggleModuleSetting("Rounded Panel Bottoms", () -> RunalSettings.roundedPanelBottoms, v -> RunalSettings.roundedPanelBottoms = v),
+                    new EnumModuleSetting("Cooldown Display", List.of("Percent", "Seconds"), () -> RunalSettings.cooldownDisplayMode, v -> RunalSettings.cooldownDisplayMode = v),
                     new ButtonModuleSetting("HUD Editor", "Open", () -> Minecraft.getInstance().setScreen(new HudEditorScreen())),
                     new KeybindModuleSetting(RunalClient.getOpenMenuKey())
             );

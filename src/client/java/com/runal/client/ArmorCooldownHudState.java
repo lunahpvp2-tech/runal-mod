@@ -10,4 +10,5 @@ public class ArmorCooldownHudState {
 
     public static final List<String> names = new ArrayList<>();
     public static final List<Integer> percents = new ArrayList<>();
+    public static final List<Integer> secondsRemaining = new ArrayList<>();
 }

@@ -266,6 +266,7 @@ public class RunalClient implements ClientModInitializer {
 		WaypointRenderer.register();
 		AutoGGController.register();
 		AutoTrashController.register();
+		PartyController.register();
 		EventTrackerController.register();
 		RealPlayerTracker.register();
 		BossTitleController.register();

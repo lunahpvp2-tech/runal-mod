@@ -165,14 +165,25 @@ public class UtilityHudRenderer {
         graphics.outline(x, y, w, h, 0x5535D77A);
     }
 
-    private record CooldownEntry(String name, int percent, int nameColor, int valueColor) {
+    private record CooldownEntry(String name, String value, int nameColor, int valueColor) {
+    }
+
+    private static boolean showSeconds() {
+        return "Seconds".equals(RunalSettings.cooldownDisplayMode);
+    }
+
+    private static String formatTicksAsSeconds(int ticks) {
+        return ((ticks + 19) / 20) + "s";
     }
 
     private static void drawCooldowns(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
         List<CooldownEntry> entries = new ArrayList<>();
+        boolean seconds = showSeconds();
 
         if (ItemCooldownHudState.enabled && mc.player != null && mc.player.containerMenu == mc.player.inventoryMenu) {
             Set<String> seenNames = new HashSet<>();
+            Set<String> activeKeys = new HashSet<>();
+            long nowTick = mc.player.tickCount;
             for (int slotId = InventoryMenu.INV_SLOT_START; slotId < InventoryMenu.USE_ROW_SLOT_END; slotId++) {
                 Slot slot = mc.player.containerMenu.getSlot(slotId);
                 if (!slot.hasItem()) continue;
@@ -184,21 +195,35 @@ public class UtilityHudRenderer {
                 if (!seenNames.add(name)) continue;
 
                 float percent = mc.player.getCooldowns().getCooldownPercent(stack, 1.0f);
-                entries.add(new CooldownEntry(name, Math.round(percent * 100f), ItemCooldownHudState.nameColor, ItemCooldownHudState.valueColor));
+                String key = "item:" + name;
+                activeKeys.add(key);
+                String value = valueFor(seconds, percent, key, nowTick);
+                entries.add(new CooldownEntry(name, value, ItemCooldownHudState.nameColor, ItemCooldownHudState.valueColor));
             }
+            CooldownDurationEstimator.pruneExcept("item:", activeKeys);
         }
 
         if (ArmorCooldownHudState.enabled) {
             for (int i = 0; i < ArmorCooldownHudState.names.size(); i++) {
-                entries.add(new CooldownEntry(ArmorCooldownHudState.names.get(i), ArmorCooldownHudState.percents.get(i), ArmorCooldownHudState.nameColor, ArmorCooldownHudState.valueColor));
+                int percent = ArmorCooldownHudState.percents.get(i);
+                String value = seconds && ArmorCooldownHudState.secondsRemaining.get(i) != null
+                        ? ArmorCooldownHudState.secondsRemaining.get(i) + "s"
+                        : percent + "%";
+                entries.add(new CooldownEntry(ArmorCooldownHudState.names.get(i), value, ArmorCooldownHudState.nameColor, ArmorCooldownHudState.valueColor));
             }
         }
 
         if (AccessoryCooldownState.enabled) {
             for (Map.Entry<String, AccessoryCooldownState.ActiveCooldown> entry : AccessoryCooldownState.active.entrySet()) {
                 AccessoryCooldownState.ActiveCooldown cooldown = entry.getValue();
-                int percent = Math.round((cooldown.remainingSeconds / (float) cooldown.totalSeconds) * 100f);
-                entries.add(new CooldownEntry(entry.getKey(), percent, AccessoryCooldownState.nameColor, AccessoryCooldownState.valueColor));
+                String value;
+                if (seconds) {
+                    value = cooldown.remainingSecondsCeil() + "s";
+                } else {
+                    int percent = Math.round((cooldown.remainingTicks / (float) cooldown.totalTicks) * 100f);
+                    value = percent + "%";
+                }
+                entries.add(new CooldownEntry(entry.getKey(), value, AccessoryCooldownState.nameColor, AccessoryCooldownState.valueColor));
             }
         }
 
@@ -207,15 +232,21 @@ public class UtilityHudRenderer {
         int h = Math.max(16, entries.size() * 11 + 8);
         int w = 60;
         for (CooldownEntry entry : entries) {
-            w = Math.max(w, mc.font.width(entry.name() + ": " + entry.percent() + "%") + 12);
+            w = Math.max(w, mc.font.width(entry.name() + ": " + entry.value()) + 12);
         }
 
         drawPanel(graphics, ItemCooldownHudState.x, ItemCooldownHudState.y, w, h, 0xAA101216);
         int y = ItemCooldownHudState.y + 5;
         for (CooldownEntry entry : entries) {
-            drawLine(graphics, mc, ItemCooldownHudState.x + 6, y, entry.name(), entry.percent() + "%", entry.nameColor(), entry.valueColor());
+            drawLine(graphics, mc, ItemCooldownHudState.x + 6, y, entry.name(), entry.value(), entry.nameColor(), entry.valueColor());
             y += 11;
         }
+    }
+
+    private static String valueFor(boolean seconds, float percent, String key, long nowTick) {
+        if (!seconds) return Math.round(percent * 100f) + "%";
+        Integer remainingTicks = CooldownDurationEstimator.estimateRemainingTicks(key, percent, nowTick);
+        return remainingTicks != null ? formatTicksAsSeconds(remainingTicks) : Math.round(percent * 100f) + "%";
     }
 
     private static void drawDungeonTracker(net.minecraft.client.gui.GuiGraphicsExtractor graphics, Minecraft mc) {
